@@ -6,5 +6,10 @@ interface GlobalContextType {
   selectedTheme: Theme;
   setSelectedTheme: (theme: Theme) => void;
 }
+interface UserContextType {
+  // Define user-related context properties here
+  displayName: string;
+  photoURL: string;
+}
 
-export type { GlobalContextType };
+export type { GlobalContextType, UserContextType };
