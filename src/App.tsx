@@ -27,12 +27,13 @@ const App = () => {
   return (
     <>
       <Header />
-      <main className="w-full min-h-screen bg-black/50 p-4 md:p-10 overflow-x-hidden">
+      <main className="w-full min-h-screen overflow-x-hidden">
         {/* Hero Section: Main introduction and value proposition */}
         <Hero />
 
         {/* Transparencia Total: Information about pricing and free features for early adopters */}
         <ContentSection
+          bgColor="bg-black/80"
           title="Transparencia Total"
           actions={
             <button
@@ -64,6 +65,7 @@ const App = () => {
 
         {/* Why Choose Us: Feature grid highlighting key advantages */}
         <ContentSection
+          bgColor="bg-black/80"
           title="¿Por qué elegirnos?"
           cardClassName="max-w-7xl"
           actions={
@@ -108,6 +110,7 @@ const App = () => {
 
         {/* Call to Action: Encouraging users to start using the app */}
         <ContentSection
+          bgColor="bg-black/80"
           title="Prepárate para transformar tu gestión de horas"
           actions={
             <button className="bg-amber-500 text-white py-2 px-6 rounded-md shadow-md hover:bg-amber-600 transition-colors cursor-pointer font-bold">

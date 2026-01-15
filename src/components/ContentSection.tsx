@@ -9,6 +9,7 @@ interface ContentSectionProps {
   titleClassName?: string;
   cardClassName?: string;
   actionsClassName?: string;
+  bgColor?: string;
 }
 
 const ContentSection: FC<ContentSectionProps> = ({
@@ -19,11 +20,12 @@ const ContentSection: FC<ContentSectionProps> = ({
   titleClassName,
   cardClassName,
   actionsClassName,
+  bgColor,
 }) => {
   return (
     <section
       className={cn(
-        "flex flex-col items-center min-h-fit max-w-7xl m-auto gap-6 md:gap-10 px-4 py-8 md:py-16",
+        `flex flex-col items-center min-h-fit m-auto gap-6 md:gap-10 py-12 px-4 md:px-8 ${bgColor ?? "transparent"}`,
         className
       )}
     >
