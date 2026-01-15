@@ -1,0 +1,18 @@
+.theme-diablo {
+  /* Estilo Inframundo - Pastelized */
+  --theme-bg: #450a0a;
+  /* Red 950 */
+  --theme-color: #fecaca;
+  /* Red 200 - Pastel */
+  --theme-secondary: #fca5a5;
+  /* Red 300 */
+  --theme-header-bg: #7f1d1d;
+  /* Red 900 */
+  --theme-accent: #f87171;
+  /* Red 400 */
+  --theme-select-indicator: #ef4444;
+  /* Red 500 */
+  background-color: var(--theme-bg);
+  background-image: url("/themes/diablo/backgrounds/bg_diablo_v2.png");
+  color: var(--theme-color);
+}

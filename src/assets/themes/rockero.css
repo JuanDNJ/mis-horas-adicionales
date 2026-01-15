@@ -1,0 +1,18 @@
+.theme-rockero {
+  /* Estilo Glam Metal / Punk - Pastelized */
+  --theme-bg: #2e1065;
+  /* Violet 950 */
+  --theme-color: #e9d5ff;
+  /* Violet 200 - Pastel */
+  --theme-secondary: #d8b4fe;
+  /* Violet 300 - Leible */
+  --theme-header-bg: #4c1d95;
+  /* Violet 900 */
+  --theme-accent: #f0abfc;
+  /* Fuchsia 300 */
+  --theme-select-indicator: #c084fc;
+  /* Violet 400 */
+  background-color: var(--theme-bg);
+  background-image: url("/themes/rockero/backgrounds/bg_rockero_v2.png");
+  color: var(--theme-color);
+}

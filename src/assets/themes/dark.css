@@ -1,0 +1,17 @@
+.theme-dark {
+  /* Estilo Vigilante Nocturno - Readable */
+  --theme-bg: #18181b;
+  /* Zinc 950 */
+  --theme-color: #f4f4f5;
+  /* Zinc 100 */
+  --theme-secondary: #a1a1aa;
+  /* Zinc 400 */
+  --theme-header-bg: #27272a;
+  /* Zinc 800 */
+  --theme-accent: #fcd34d;
+  /* Amber 300 */
+  --theme-select-indicator: #38bdf8;
+  /* Sky 400 */
+  background-color: var(--theme-bg);
+  color: var(--theme-color);
+}

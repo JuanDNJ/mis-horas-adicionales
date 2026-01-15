@@ -1,0 +1,17 @@
+.theme-heroe {
+  /* Estilo Edad de Oro / Patriota - Pastelized */
+  --theme-bg: #eff6ff;
+  /* Blue 50 */
+  --theme-color: #1e3a8a;
+  /* Blue 950 */
+  --theme-secondary: #1d4ed8;
+  /* Blue 700 */
+  --theme-header-bg: #bfdbfe;
+  /* Blue 200 */
+  --theme-accent: #ef4444;
+  /* Red 500 */
+  --theme-select-indicator: #2563eb;
+  /* Blue 600 */
+  background-color: var(--theme-bg);
+  color: var(--theme-color);
+}

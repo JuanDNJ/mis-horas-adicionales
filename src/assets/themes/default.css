@@ -1,0 +1,18 @@
+.theme-default {
+  /* Estilo Novela Gráfica / Tinta - Readable */
+  --theme-bg: #f8fafc;
+  /* Slate 50 */
+  --theme-color: #1e293b;
+  /* Slate 800 */
+  --theme-secondary: #64748b;
+  /* Slate 500 */
+  --theme-header-bg: #dbeafe;
+  /* Blue 100 */
+  --theme-accent: #3b82f6;
+  /* Blue 500 */
+  --theme-select-indicator: #0f172a;
+  /* Slate 900 */
+  background-color: var(--theme-bg);
+  box-shadow: 8px 8px 0px #121212;
+  /* Sombra dura estilo cómic */
+}

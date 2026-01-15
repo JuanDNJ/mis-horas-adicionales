@@ -1,0 +1,16 @@
+.theme-light {
+  /* Estilo Día Soleado - Readable */
+  --theme-bg: #ffffff;
+  --theme-color: #0f172a;
+  /* Slate 900 */
+  --theme-secondary: #475569;
+  /* Slate 600 */
+  --theme-header-bg: #f1f5f9;
+  /* Slate 100 */
+  --theme-accent: #f59e0b;
+  /* Amber 500 */
+  --theme-select-indicator: #334155;
+  /* Slate 700 */
+  background-color: var(--theme-bg);
+  color: var(--theme-color);
+}

@@ -1,0 +1,17 @@
+.theme-espacio {
+  /* Estilo Sci-Fi Retro / Alien - Pastelized */
+  --theme-bg: #020617;
+  /* Slate 950 */
+  --theme-color: #e0f2fe;
+  /* Sky 100 */
+  --theme-secondary: #7dd3fc;
+  /* Sky 300 */
+  --theme-header-bg: #0f172a;
+  /* Slate 900 */
+  --theme-accent: #38bdf8;
+  /* Sky 400 */
+  --theme-select-indicator: #0ea5e9;
+  /* Sky 500 */
+  background-color: var(--theme-bg);
+  color: var(--theme-color);
+}

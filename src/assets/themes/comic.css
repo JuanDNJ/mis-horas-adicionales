@@ -1,0 +1,18 @@
+.theme-comic {
+  /* Estilo Pop Art / CMYK - Pastelized */
+  --theme-bg: #fffbeb;
+  /* Amber 50 - Suave */
+  --theme-color: #1a1a1a;
+  /* Casi Negro - Leible */
+  --theme-secondary: #4b5563;
+  /* Gris Oscuro - Leible */
+  --theme-header-bg: #fbbf24;
+  /* Amber 400 - Amarillo Comic pero menos neon */
+  --theme-accent: #0ea5e9;
+  /* Sky 500 */
+  --theme-select-indicator: #db2777;
+  /* Pink 600 */
+  background-color: var(--theme-bg);
+  background-image: url("/themes/comic/backgrounds/bg_comic_v2.png");
+  color: var(--theme-color);
+}

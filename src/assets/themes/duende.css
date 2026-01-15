@@ -1,0 +1,17 @@
+.theme-duende {
+  /* Estilo Fantasía Boscosa / Folclore - Pastelized */
+  --theme-bg: #ecfdf5;
+  /* Emerald 50 */
+  --theme-color: #064e3b;
+  /* Emerald 900 */
+  --theme-secondary: #059669;
+  /* Emerald 600 */
+  --theme-header-bg: #a7f3d0;
+  /* Emerald 200 */
+  --theme-accent: #10b981;
+  /* Emerald 500 */
+  --theme-select-indicator: #047857;
+  /* Emerald 700 */
+  background-color: var(--theme-bg);
+  color: var(--theme-color);
+}

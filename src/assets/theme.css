@@ -1,0 +1,50 @@
+@import "tailwindcss";
+@import "./themes/diablo.css";
+@import "./themes/andalucia.css";
+@import "./themes/comic.css";
+@import "./themes/rockero.css";
+@import "./themes/default.css";
+@import "./themes/light.css";
+@import "./themes/dark.css";
+@import "./themes/duende.css";
+@import "./themes/militar.css";
+@import "./themes/heroe.css";
+@import "./themes/espacio.css";
+
+@theme {
+  --color-primary: #343434;
+  --color-hover: #747bff;
+
+  /* Theme Variable Slots */
+  --color-theme-color: var(--theme-color);
+  --color-theme-bg: var(--theme-bg);
+  --color-secondary: var(--theme-secondary);
+  --color-option-selected: var(--theme-accent);
+  --color-select: var(--theme-select-indicator);
+  --color-header-bg: var(--theme-header-bg);
+}
+
+:root {
+  --theme-bg-image: none;
+}
+
+/* @media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+@media (prefers-color-scheme: light) {
+  :root {
+    --primary-color:  rgba(255, 255, 255, 0.87);;
+    --secondary-color: #343434;
+    --color-hover : #74ff79;
+  }
+
+  a:hover {
+    color: var(--color-hover);
+  }
+
+  button {
+    background-color: #f9f9f9;
+  }
+} */

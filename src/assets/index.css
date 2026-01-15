@@ -1,0 +1,23 @@
+@import "./theme.css";
+
+html,
+body {
+  font-size: 116.36%;
+  font-family: fantasy, Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  display: block;
+  margin: 0;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  min-height: 4rem;
+  height: 100%;
+}

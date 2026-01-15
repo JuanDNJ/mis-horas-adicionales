@@ -1,0 +1,13 @@
+.theme-andalucia {
+  --theme-bg: #ffffff;
+  --theme-color: #14532d;
+  /* Green 900 */
+  --theme-secondary: #16a34a;
+  /* Green 600 */
+  --theme-header-bg: #dcfce7;
+  /* Green 100 */
+  --theme-accent: #22c55e;
+  /* Green 500 */
+  --theme-select-indicator: #15803d;
+  background-image: url("/themes/andalucia/backgrounds/bg_andalucia_v2.png");
+}

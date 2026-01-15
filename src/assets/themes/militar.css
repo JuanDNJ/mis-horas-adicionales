@@ -1,0 +1,17 @@
+.theme-militar {
+  /* Estilo Comando Táctico - Pastelized */
+  --theme-bg: #f5f5f4;
+  /* Stone 100 */
+  --theme-color: #44403c;
+  /* Stone 700 */
+  --theme-secondary: #78716c;
+  /* Stone 500 */
+  --theme-header-bg: #d6d3d1;
+  /* Stone 300 */
+  --theme-accent: #84cc16;
+  /* Lime 500 */
+  --theme-select-indicator: #57534e;
+  /* Stone 600 */
+  background-color: var(--theme-bg);
+  color: var(--theme-color);
+}
