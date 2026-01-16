@@ -19,10 +19,14 @@ export default defineConfig({
     },
   },
   build: {
+    chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
         manualChunks: (id) => {
           if (id.includes("node_modules")) {
+            if (id.includes("firebase")) {
+              return "firebase";
+            }
             if (
               id.includes("react") ||
               id.includes("react-dom") ||
@@ -32,6 +36,9 @@ export default defineConfig({
             }
             if (
               id.includes("react-icons") ||
+              id.includes("lucide-react") ||
+              id.includes("react-day-picker") ||
+              id.includes("date-fns") ||
               id.includes("clsx") ||
               id.includes("tailwind-merge")
             ) {

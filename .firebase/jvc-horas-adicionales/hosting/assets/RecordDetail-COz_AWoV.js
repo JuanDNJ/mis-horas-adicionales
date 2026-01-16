@@ -1,0 +1,116 @@
+import { B as e, E as t, P as n, W as r, l as i, z as a } from "./vendor-CPiAnCAo.js";
+import { i as o, n as s, t as c } from "./Main-DWFXURMq.js";
+import { t as l } from "./HoursForm-CIkwc9GH.js";
+var u = r(),
+  d = n(),
+  f = () => {
+    let { id: n } = e(),
+      r = a(),
+      [f, p] = (0, u.useState)(() => {
+        let e = localStorage.getItem(`horas-data`);
+        if (e)
+          try {
+            let t = JSON.parse(e),
+              r = parseInt(n || `-1`, 10);
+            if (r >= 0 && r < t.length) return t[r];
+          } catch {
+            localStorage.removeItem(`horas-data`);
+          }
+        return null;
+      });
+    return (
+      (0, u.useEffect)(() => {
+        let e = localStorage.getItem(`horas-data`);
+        if (!e) {
+          r(`/dashboard`);
+          return;
+        }
+        try {
+          let t = JSON.parse(e),
+            i = parseInt(n || `-1`, 10);
+          if (i < 0 || i >= t.length) {
+            r(`/dashboard`);
+            return;
+          }
+        } catch {
+          (localStorage.removeItem(`horas-data`), r(`/dashboard`));
+        }
+      }, [n, r]),
+      f
+        ? (0, d.jsxs)(d.Fragment, {
+            children: [
+              (0, d.jsx)(s, {}),
+              (0, d.jsx)(c, {
+                children: (0, d.jsxs)(`div`, {
+                  className: `w-full max-w-4xl mx-auto py-8 px-4 space-y-6`,
+                  children: [
+                    (0, d.jsxs)(`div`, {
+                      className: `flex items-center justify-between border-b-4 border-black pb-4`,
+                      children: [
+                        (0, d.jsx)(`h1`, {
+                          className: `text-3xl font-black uppercase text-theme-color drop-shadow-sm`,
+                          children: `Editar Registro`,
+                        }),
+                        (0, d.jsxs)(`button`, {
+                          onClick: () => r(`/dashboard`),
+                          className: `flex items-center gap-2 font-bold hover:underline`,
+                          children: [(0, d.jsx)(i, {}), ` Volver`],
+                        }),
+                      ],
+                    }),
+                    (0, d.jsxs)(`div`, {
+                      className: `bg-theme-bg/80 p-6 border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]`,
+                      children: [
+                        (0, d.jsx)(l, {
+                          formData: f,
+                          onChange: (e) => {
+                            if (!f) return;
+                            let { name: t, value: n } = e.target;
+                            p((e) => {
+                              if (!e) return null;
+                              let r = { ...e, [t]: n };
+                              return (
+                                (t === `hora_entrada` || t === `hora_salida`) &&
+                                  r.hora_entrada &&
+                                  r.hora_salida &&
+                                  (r.total_horas = o(r.hora_entrada, r.hora_salida)),
+                                r
+                              );
+                            });
+                          },
+                          setFormData: p,
+                        }),
+                        (0, d.jsx)(`div`, {
+                          className: `mt-8 flex justify-end`,
+                          children: (0, d.jsxs)(`button`, {
+                            onClick: () => {
+                              if (!f) return;
+                              let e = localStorage.getItem(`horas-data`);
+                              if (e)
+                                try {
+                                  let t = JSON.parse(e),
+                                    i = parseInt(n || `-1`, 10);
+                                  i >= 0 &&
+                                    i < t.length &&
+                                    ((t[i] = f),
+                                    localStorage.setItem(`horas-data`, JSON.stringify(t)),
+                                    r(`/dashboard`));
+                                } catch {
+                                  (localStorage.removeItem(`horas-data`), r(`/dashboard`));
+                                }
+                            },
+                            className: `flex items-center gap-2 bg-theme-accent text-white px-6 py-3 font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:brightness-110 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all`,
+                            children: [(0, d.jsx)(t, {}), ` Guardar Cambios`],
+                          }),
+                        }),
+                      ],
+                    }),
+                  ],
+                }),
+              }),
+            ],
+          })
+        : (0, d.jsx)(`div`, { children: `Cargando...` })
+    );
+  };
+export { f as default };
