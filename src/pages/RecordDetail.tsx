@@ -12,10 +12,14 @@ const RecordDetail = () => {
   const [record, setRecord] = useState<HoursData | null>(() => {
     const saved = localStorage.getItem("horas-data");
     if (saved) {
-      const data = JSON.parse(saved);
-      const index = parseInt(id || "-1", 10);
-      if (index >= 0 && index < data.length) {
-        return data[index];
+      try {
+        const data = JSON.parse(saved);
+        const index = parseInt(id || "-1", 10);
+        if (index >= 0 && index < data.length) {
+          return data[index];
+        }
+      } catch {
+        localStorage.removeItem("horas-data");
       }
     }
     return null;
@@ -27,11 +31,16 @@ const RecordDetail = () => {
       navigate("/dashboard");
       return;
     }
-    const data = JSON.parse(saved);
-    const index = parseInt(id || "-1", 10);
-    if (index < 0 || index >= data.length) {
+    try {
+      const data = JSON.parse(saved);
+      const index = parseInt(id || "-1", 10);
+      if (index < 0 || index >= data.length) {
+        navigate("/dashboard");
+        return;
+      }
+    } catch {
+      localStorage.removeItem("horas-data");
       navigate("/dashboard");
-      return;
     }
   }, [id, navigate]);
 
@@ -55,11 +64,16 @@ const RecordDetail = () => {
     if (!record) return;
     const saved = localStorage.getItem("horas-data");
     if (saved) {
-      const data = JSON.parse(saved);
-      const index = parseInt(id || "-1", 10);
-      if (index >= 0 && index < data.length) {
-        data[index] = record;
-        localStorage.setItem("horas-data", JSON.stringify(data));
+      try {
+        const data = JSON.parse(saved);
+        const index = parseInt(id || "-1", 10);
+        if (index >= 0 && index < data.length) {
+          data[index] = record;
+          localStorage.setItem("horas-data", JSON.stringify(data));
+          navigate("/dashboard");
+        }
+      } catch {
+        localStorage.removeItem("horas-data");
         navigate("/dashboard");
       }
     }
