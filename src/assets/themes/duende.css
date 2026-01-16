@@ -12,6 +12,10 @@
   /* Emerald 500 */
   --theme-select-indicator: #047857;
   /* Emerald 700 */
+  --action-create: #65a30d;
+  --action-edit: #eab308;
+  --action-delete: #be123c;
+  --action-update: #15803d;
   background-color: var(--theme-bg);
   color: var(--theme-color);
 }

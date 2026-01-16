@@ -12,6 +12,10 @@
   /* Amber 300 */
   --theme-select-indicator: #38bdf8;
   /* Sky 400 */
+  --action-create: #60a5fa;
+  --action-edit: #facc15;
+  --action-delete: #f87171;
+  --action-update: #4ade80;
   background-color: var(--theme-bg);
   color: var(--theme-color);
 }

@@ -36,4 +36,3 @@ export function calculateDuration(startTime: string, endTime: string): string {
   // Round to 2 decimal places if needed, or keeping it clean
   return hours % 1 === 0 ? hours.toString() : hours.toFixed(2);
 }
-

@@ -12,6 +12,10 @@
   /* Red 500 */
   --theme-select-indicator: #2563eb;
   /* Blue 600 */
+  --action-create: #ef4444;
+  --action-edit: #eab308;
+  --action-delete: #1d4ed8;
+  --action-update: #22c55e;
   background-color: var(--theme-bg);
   color: var(--theme-color);
 }

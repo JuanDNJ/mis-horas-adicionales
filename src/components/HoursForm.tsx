@@ -27,6 +27,7 @@ export interface HoursData {
   hora_salida: string;
   origen: string;
   destino: string;
+  ramo?: string;
   total_horas: string;
   firma: string;
 }
@@ -41,15 +42,18 @@ const InputGroup = ({
   label,
   children,
   className,
+  headerActions,
 }: {
   label: string;
   children: ReactNode;
   className?: string;
+  headerActions?: ReactNode;
 }) => (
   <div className={cn("flex flex-col gap-2 p-4 border-2 border-black bg-white/50", className)}>
-    <h3 className="text-lg font-black uppercase italic text-theme-color border-b-2 border-black pb-1 mb-2">
-      {label}
-    </h3>
+    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b-2 border-black pb-1 mb-2 gap-2">
+      <h3 className="text-lg font-black uppercase italic text-theme-color">{label}</h3>
+      {headerActions && <div className="flex items-center">{headerActions}</div>}
+    </div>
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">{children}</div>
   </div>
 );
@@ -75,8 +79,43 @@ const Input = ({ label, className, containerClassName, ...props }: InputProps) =
   </div>
 );
 
+const SectorNavigation = ({
+  selectedSector,
+  onSectorChange,
+}: {
+  selectedSector: "general" | "transport";
+  onSectorChange: (sector: "general" | "transport") => void;
+}) => (
+  <nav className="flex items-center gap-4 bg-white/50 px-3 py-1 rounded-sm border border-black/20">
+    <span className="text-xs font-bold uppercase text-secondary mr-2">Sector:</span>
+    <label className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
+      <input
+        type="radio"
+        name="sector_type"
+        value="general"
+        checked={selectedSector === "general"}
+        onChange={() => onSectorChange("general")}
+        className="accent-theme-color w-4 h-4 cursor-pointer"
+      />
+      <span className="text-sm font-bold text-theme-color select-none">General</span>
+    </label>
+    <label className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
+      <input
+        type="radio"
+        name="sector_type"
+        value="transport"
+        checked={selectedSector === "transport"}
+        onChange={() => onSectorChange("transport")}
+        className="accent-theme-color w-4 h-4 cursor-pointer"
+      />
+      <span className="text-sm font-bold text-theme-color select-none">Transporte</span>
+    </label>
+  </nav>
+);
+
 export const HoursForm = ({ formData, onChange, setFormData }: HoursFormProps) => {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [sector, setSector] = useState<"general" | "transport">("general");
 
   // Helper to handle date selection from Calendar
   const handleDateSelect = (date: Date | undefined) => {
@@ -207,7 +246,10 @@ export const HoursForm = ({ formData, onChange, setFormData }: HoursFormProps) =
         </InputGroup>
 
         {/* Detalle del Viaje */}
-        <InputGroup label="Detalles del Servicio">
+        <InputGroup
+          label="Detalles del Servicio"
+          headerActions={<SectorNavigation selectedSector={sector} onSectorChange={setSector} />}
+        >
           <Input
             label="Hora Entrada"
             name="hora_entrada"
@@ -229,37 +271,37 @@ export const HoursForm = ({ formData, onChange, setFormData }: HoursFormProps) =
             onChange={onChange}
             placeholder="0"
             type="number"
-            readOnly // Computed manually or by effect usually, but let's allow edit if needed? Use readOnly for safety if purely computed.
-            // Leaving editable for flexibility as requested "formulario para esos datos"
+            readOnly
           />
-          <Input
-            label="Origen"
-            name="origen"
-            value={formData.origen}
-            onChange={onChange}
-            placeholder="Lugar de origen"
-            containerClassName="col-span-1 md:col-span-1 lg:col-span-1"
-          />
-          <Input
-            label="Destino"
-            name="destino"
-            value={formData.destino}
-            onChange={onChange}
-            placeholder="Lugar de destino"
-            containerClassName="col-span-1 md:col-span-1 lg:col-span-2"
-          />
-        </InputGroup>
 
-        {/* Firma */}
-        <InputGroup label="Validación">
-          <Input
-            label="Firma Digital"
-            name="firma"
-            value={formData.firma}
-            onChange={onChange}
-            placeholder="Nombre completo o firma digital"
-            containerClassName="col-span-1 md:col-span-3 lg:col-span-3"
-          />
+          {sector === "transport" && (
+            <>
+              <Input
+                label="Ramo"
+                name="ramo"
+                value={formData.ramo || ""}
+                onChange={onChange}
+                placeholder="Ej: Transporte de mercancías"
+                containerClassName="col-span-1 md:col-span-1 lg:col-span-3"
+              />
+              <Input
+                label="Origen"
+                name="origen"
+                value={formData.origen}
+                onChange={onChange}
+                placeholder="Lugar de origen"
+                containerClassName="col-span-1 md:col-span-1 lg:col-span-1"
+              />
+              <Input
+                label="Destino"
+                name="destino"
+                value={formData.destino}
+                onChange={onChange}
+                placeholder="Lugar de destino"
+                containerClassName="col-span-1 md:col-span-1 lg:col-span-2"
+              />
+            </>
+          )}
         </InputGroup>
       </form>
     </div>

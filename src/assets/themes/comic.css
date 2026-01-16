@@ -12,6 +12,10 @@
   /* Sky 500 */
   --theme-select-indicator: #db2777;
   /* Pink 600 */
+  --action-create: #0ea5e9;
+  --action-edit: #facc15;
+  --action-delete: #f43f5e;
+  --action-update: #10b981;
   background-color: var(--theme-bg);
   background-image: url("/themes/comic/backgrounds/bg_comic_v2.png");
   color: var(--theme-color);

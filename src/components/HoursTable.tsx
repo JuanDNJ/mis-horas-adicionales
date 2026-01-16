@@ -1,6 +1,5 @@
 import { FaTrash } from "react-icons/fa";
 import { type HoursData } from "./HoursForm";
-import { cn } from "@/lib/utils";
 
 interface HoursTableProps {
   data: HoursData[];
@@ -51,7 +50,7 @@ export const HoursTable = ({ data, onDelete }: HoursTableProps) => {
                   {item.total_horas}h
                 </td>
                 <td
-                  className="p-4 border-r-2 border-black max-w-[200px] truncate"
+                  className="p-4 border-r-2 border-black max-w-50 truncate"
                   title={`${item.origen} -> ${item.destino}`}
                 >
                   {item.origen} &rarr; {item.destino}
@@ -63,7 +62,7 @@ export const HoursTable = ({ data, onDelete }: HoursTableProps) => {
                 <td className="p-4 text-center">
                   <button
                     onClick={() => onDelete(index)}
-                    className="p-2 bg-red-500 hover:bg-red-600 border-2 border-black text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all"
+                    className="p-2 bg-action-delete hover:brightness-110 border-2 border-black text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-0.5 active:translate-y-0.5 transition-all"
                     title="Eliminar registro"
                   >
                     <FaTrash size={18} />
@@ -85,7 +84,7 @@ export const HoursTable = ({ data, onDelete }: HoursTableProps) => {
             <div className="absolute top-2 right-2">
               <button
                 onClick={() => onDelete(index)}
-                className="p-2 bg-red-500 hover:bg-red-600 border-2 border-black text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
+                className="p-2 bg-action-delete hover:brightness-110 border-2 border-black text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
               >
                 <FaTrash size={16} />
               </button>

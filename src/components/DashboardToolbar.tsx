@@ -14,10 +14,10 @@ export const DashboardToolbar = ({ isFormOpen, onToggleForm }: DashboardToolbarP
         <button
           onClick={onToggleForm}
           className={cn(
-            "flex items-center gap-2 px-6 py-3 font-black uppercase text-sm border-2 border-black transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px]",
+            "flex items-center gap-2 px-6 py-3 font-black uppercase text-sm border-2 border-black transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-0.5 active:translate-y-0.5",
             isFormOpen
-              ? "bg-red-500 text-white hover:bg-red-600"
-              : "bg-theme-accent text-white hover:brightness-110"
+              ? "bg-action-delete text-white hover:brightness-110"
+              : "bg-action-create text-white hover:brightness-110"
           )}
         >
           {isFormOpen ? <FaTimes size={16} /> : <FaPlus size={16} />}
@@ -28,7 +28,7 @@ export const DashboardToolbar = ({ isFormOpen, onToggleForm }: DashboardToolbarP
       {/* Right Actions: Filters Placeholders */}
       <div className="flex items-center gap-2">
         {/* Placeholder for future filters */}
-        <div className="flex items-center gap-2 px-4 py-2 border-2 border-black bg-white/50 opacity-60 cursor-not-allowed hidden md:flex">
+        <div className="items-center gap-2 px-4 py-2 border-2 border-black bg-white/50 opacity-60 cursor-not-allowed hidden md:flex">
           <FaFilter className="text-secondary" />
           <span className="text-secondary font-bold text-xs uppercase">Filtros (Próximamente)</span>
         </div>

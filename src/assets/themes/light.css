@@ -11,6 +11,10 @@
   /* Amber 500 */
   --theme-select-indicator: #334155;
   /* Slate 700 */
+  --action-create: #0284c7;
+  --action-edit: #d97706;
+  --action-delete: #dc2626;
+  --action-update: #16a34a;
   background-color: var(--theme-bg);
   color: var(--theme-color);
 }
