@@ -1,17 +1,30 @@
 import Header from "@/components/Header";
 import Main from "@/components/Main";
+import { useProfileContext } from "@/hooks/useProfileContext";
 import { type FC } from "react";
 
 const Profile: FC = () => {
+  const { displayName, photoURL } = useProfileContext();
+
   return (
     <>
       <Header />
       <Main>
         <section className="flex flex-col items-center justify-center w-full max-w-md p-6 bg-white/10 backdrop-blur-md rounded-xl shadow-lg border border-white/20 mx-4">
           <article className="w-24 h-24 bg-gray-300 rounded-full mb-4 flex items-center justify-center text-4xl text-gray-600 font-bold">
-            U
+            {photoURL && photoURL.length > 0 ? (
+              <img
+                src={photoURL}
+                alt={displayName.charAt(0).toUpperCase()}
+                className="w-full h-full rounded-full object-cover"
+              />
+            ) : (
+              "A"
+            )}
           </article>
-          <h2 className="text-2xl font-bold text-theme-color mb-2">Usuario</h2>
+          {displayName && displayName.length > 0 && (
+            <h2 className="text-2xl font-bold text-theme-color mb-2">Usuario {displayName}</h2>
+          )}
           <p className="text-secondary mb-6 text-center">
             Bienvenido a tu perfil. Aquí podrás gestionar tu información personal y ajustes.
           </p>

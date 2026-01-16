@@ -11,6 +11,7 @@ interface UserContextType {
   displayName: string;
   photoURL: string;
   phoneNumber?: string;
+  updateUserProfile?: (name: string, photo: string, phoneNumber: string) => void;
 }
 
 export type { GlobalContextType, UserContextType };
