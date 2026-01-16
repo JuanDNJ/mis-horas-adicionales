@@ -10,6 +10,7 @@ interface UserContextType {
   // Define user-related context properties here
   displayName: string;
   photoURL: string;
+  phoneNumber?: string;
 }
 
 export type { GlobalContextType, UserContextType };
