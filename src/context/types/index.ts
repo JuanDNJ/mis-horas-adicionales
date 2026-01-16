@@ -10,6 +10,7 @@ interface UserContextType {
   // Define user-related context properties here
   displayName: string;
   photoURL: string;
+  updateUserProfile?: (name: string, photo: string) => void;
 }
 
 export type { GlobalContextType, UserContextType };
