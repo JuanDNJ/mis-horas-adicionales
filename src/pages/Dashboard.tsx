@@ -1,15 +1,19 @@
 import Header from "@/components/Header";
 import Main from "@/components/Main";
-import { useState, type ChangeEvent } from "react";
+import { useState, useEffect, type ChangeEvent } from "react";
 import { HoursForm, type HoursData } from "@/components/HoursForm";
 import { HoursTable } from "@/components/HoursTable";
 import { DashboardToolbar } from "@/components/DashboardToolbar";
 import { FaPlus, FaTimes } from "react-icons/fa";
-import { calculateDuration } from "@/lib/utils";
+import { calculateDuration, cn } from "@/lib/utils";
 
 const Dashboard = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [horas, setHoras] = useState<HoursData[]>([]);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [horas, setHoras] = useState<HoursData[]>(() => {
+    const saved = localStorage.getItem("horas-data");
+    return saved ? JSON.parse(saved) : [];
+  });
   const [misHoras, setMisHoras] = useState<HoursData>({
     empresa: "",
     numero_empleado: "",
@@ -25,8 +29,12 @@ const Dashboard = () => {
     origen: "",
     destino: "",
     total_horas: "",
-    firma: "",
   });
+
+  // Persist horas to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("horas-data", JSON.stringify(horas));
+  }, [horas]);
 
   const handleHoursChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -47,8 +55,17 @@ const Dashboard = () => {
       alert("Por favor completa los campos obligatorios");
       return;
     }
-    setHoras([...horas, misHoras]);
-    // Reset form (keeping some persistent data if needed? No, full reset for now)
+
+    if (editingIndex !== null) {
+      const updatedHoras = [...horas];
+      updatedHoras[editingIndex] = misHoras;
+      setHoras(updatedHoras);
+      setEditingIndex(null);
+    } else {
+      setHoras([...horas, misHoras]);
+    }
+
+    // Reset form
     setMisHoras({
       empresa: "",
       numero_empleado: "",
@@ -64,12 +81,52 @@ const Dashboard = () => {
       origen: "",
       destino: "",
       total_horas: "",
-      firma: "",
+      ramo: "",
     });
+    setIsFormOpen(false);
+  };
+
+  const handleEditHour = (index: number) => {
+    setMisHoras(horas[index]);
+    setEditingIndex(index);
+    setIsFormOpen(true);
   };
 
   const handleDeleteHour = (index: number) => {
     setHoras(horas.filter((_, i) => i !== index));
+    if (editingIndex === index) {
+      setEditingIndex(null);
+      setIsFormOpen(false);
+    }
+  };
+
+  const handleToggleForm = () => {
+    if (!isFormOpen) {
+      // Opening for new record -> Reset everything
+      setMisHoras({
+        empresa: "",
+        numero_empleado: "",
+        nombre: "",
+        apellido_paterno: "",
+        apellido_materno: "",
+        telefono: "",
+        dia: "",
+        mes: "",
+        anio: "",
+        hora_entrada: "",
+        hora_salida: "",
+        origen: "",
+        destino: "",
+        total_horas: "",
+        ramo: "",
+      });
+      setEditingIndex(null);
+      setIsFormOpen(true);
+    } else {
+      // Closing
+      setIsFormOpen(false);
+      setEditingIndex(null); // Optional: clear editing state on close
+    }
   };
 
   return (
@@ -77,10 +134,7 @@ const Dashboard = () => {
       <Header />
       <Main>
         <div className="w-full flex flex-col py-8 px-4">
-          <DashboardToolbar
-            isFormOpen={isFormOpen}
-            onToggleForm={() => setIsFormOpen(!isFormOpen)}
-          />
+          <DashboardToolbar isFormOpen={isFormOpen} onToggleForm={handleToggleForm} />
 
           <div className="flex flex-col xl:flex-row items-start justify-center w-full gap-8">
             {/* Form Column - Conditional Rendering with Modal for Mobile */}
@@ -107,13 +161,16 @@ const Dashboard = () => {
                   <button
                     onClick={() => {
                       handleAddHour();
-                      // Optional: Close modal on mobile after add?
-                      // setIsFormOpen(false); // Let's keep it open for multiple entries or user closes it manually
                     }}
                     className="mt-8 group flex items-center gap-3 bg-action-create text-white border-4 border-black font-black uppercase tracking-widest text-xl py-4 px-12 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer w-full justify-center xl:w-auto xl:mt-8"
                   >
-                    <FaPlus className="group-hover:rotate-90 transition-transform duration-300" />
-                    Registrar
+                    <FaPlus
+                      className={cn(
+                        "transition-transform duration-300",
+                        editingIndex !== null ? "" : "group-hover:rotate-90"
+                      )}
+                    />
+                    {editingIndex !== null ? "Actualizar" : "Registrar"}
                   </button>
 
                   {/* Spacer for mobile scroll */}
@@ -124,7 +181,7 @@ const Dashboard = () => {
 
             {/* Table Column - Auto Expand */}
             <div className="w-full xl:flex-1 h-full animate-in fade-in duration-500">
-              <HoursTable data={horas} onDelete={handleDeleteHour} />
+              <HoursTable data={horas} onDelete={handleDeleteHour} onEdit={handleEditHour} />
             </div>
           </div>
         </div>

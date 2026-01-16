@@ -29,7 +29,6 @@ export interface HoursData {
   destino: string;
   ramo?: string;
   total_horas: string;
-  firma: string;
 }
 
 interface HoursFormProps {
@@ -115,7 +114,10 @@ const SectorNavigation = ({
 
 export const HoursForm = ({ formData, onChange, setFormData }: HoursFormProps) => {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-  const [sector, setSector] = useState<"general" | "transport">("general");
+  // Initialize from formData.ramo/origin if present, otherwise default to general
+  const [sector, setSector] = useState<"general" | "transport">(() => {
+    return formData.ramo || formData.origen || formData.destino ? "transport" : "general";
+  });
 
   // Helper to handle date selection from Calendar
   const handleDateSelect = (date: Date | undefined) => {

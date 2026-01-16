@@ -1,12 +1,13 @@
-import { FaTrash } from "react-icons/fa";
+import { FaTrash, FaPen } from "react-icons/fa";
 import { type HoursData } from "./HoursForm";
 
 interface HoursTableProps {
   data: HoursData[];
   onDelete: (index: number) => void;
+  onEdit: (index: number) => void;
 }
 
-export const HoursTable = ({ data, onDelete }: HoursTableProps) => {
+export const HoursTable = ({ data, onDelete, onEdit }: HoursTableProps) => {
   if (data.length === 0) {
     return (
       <div className="w-full text-center p-8 border-4 border-black border-dashed bg-white/30 rounded-sm">
@@ -27,10 +28,14 @@ export const HoursTable = ({ data, onDelete }: HoursTableProps) => {
           <thead>
             <tr className="bg-theme-header-bg border-b-4 border-black text-theme-color uppercase tracking-wider text-sm">
               <th className="p-4 border-r-2 border-black font-black">Fecha</th>
-              <th className="p-4 border-r-2 border-black font-black">Horario</th>
+              <th className="p-4 border-r-2 border-black font-black hidden lg:table-cell">
+                Horario
+              </th>
               <th className="p-4 border-r-2 border-black font-black">Total</th>
-              <th className="p-4 border-r-2 border-black font-black">Ruta</th>
-              <th className="p-4 border-r-2 border-black font-black">Empleado</th>
+              <th className="p-4 border-r-2 border-black font-black hidden xl:table-cell">Ruta</th>
+              <th className="p-4 border-r-2 border-black font-black hidden 2xl:table-cell">
+                Empleado
+              </th>
               <th className="p-4 border-black font-black text-center">Acciones</th>
             </tr>
           </thead>
@@ -43,30 +48,45 @@ export const HoursTable = ({ data, onDelete }: HoursTableProps) => {
                 <td className="p-4 border-r-2 border-black">
                   {item.dia}/{item.mes}/{item.anio}
                 </td>
-                <td className="p-4 border-r-2 border-black whitespace-nowrap">
+                <td className="p-4 border-r-2 border-black whitespace-nowrap hidden lg:table-cell">
                   {item.hora_entrada} - {item.hora_salida}
                 </td>
                 <td className="p-4 border-r-2 border-black bg-theme-accent/10 text-theme-color">
                   {item.total_horas}h
                 </td>
                 <td
-                  className="p-4 border-r-2 border-black max-w-50 truncate"
+                  className="p-4 border-r-2 border-black max-w-50 truncate hidden xl:table-cell"
                   title={`${item.origen} -> ${item.destino}`}
                 >
-                  {item.origen} &rarr; {item.destino}
+                  {item.origen && item.destino ? (
+                    <>
+                      {item.origen} &rarr; {item.destino}
+                    </>
+                  ) : (
+                    <span className="opacity-50 italic">N/A</span>
+                  )}
                 </td>
-                <td className="p-4 border-r-2 border-black">
+                <td className="p-4 border-r-2 border-black hidden 2xl:table-cell">
                   {item.nombre} {item.apellido_paterno}
                   <div className="text-xs opacity-60 font-mono">{item.numero_empleado}</div>
                 </td>
                 <td className="p-4 text-center">
-                  <button
-                    onClick={() => onDelete(index)}
-                    className="p-2 bg-action-delete hover:brightness-110 border-2 border-black text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-0.5 active:translate-y-0.5 transition-all"
-                    title="Eliminar registro"
-                  >
-                    <FaTrash size={18} />
-                  </button>
+                  <div className="flex items-center justify-center gap-2">
+                    <button
+                      onClick={() => onEdit(index)}
+                      className="p-2 bg-theme-accent hover:brightness-110 border-2 border-black text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-0.5 active:translate-y-0.5 transition-all"
+                      title="Editar registro"
+                    >
+                      <FaPen size={18} />
+                    </button>
+                    <button
+                      onClick={() => onDelete(index)}
+                      className="p-2 bg-action-delete hover:brightness-110 border-2 border-black text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-0.5 active:translate-y-0.5 transition-all"
+                      title="Eliminar registro"
+                    >
+                      <FaTrash size={18} />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -81,7 +101,13 @@ export const HoursTable = ({ data, onDelete }: HoursTableProps) => {
             key={index}
             className="border-4 border-black bg-theme-bg p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] relative flex flex-col gap-2"
           >
-            <div className="absolute top-2 right-2">
+            <div className="absolute top-2 right-2 flex gap-2">
+              <button
+                onClick={() => onEdit(index)}
+                className="p-2 bg-theme-accent hover:brightness-110 border-2 border-black text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
+              >
+                <FaPen size={14} />
+              </button>
               <button
                 onClick={() => onDelete(index)}
                 className="p-2 bg-action-delete hover:brightness-110 border-2 border-black text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"

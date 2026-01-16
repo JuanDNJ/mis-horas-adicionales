@@ -132,7 +132,7 @@ const App = () => {
                 <button
                   key={theme.id}
                   onClick={() => setSelectedTheme(theme)}
-                  className="bg-white border-2 border-gray-800 hover:bg-gray-100 text-gray-900 font-bold py-2 px-4 rounded shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all cursor-pointer flex items-center gap-2"
+                  className="bg-white border-2 border-gray-800 hover:bg-gray-100 text-gray-900 font-bold py-2 px-4 rounded shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:translate-x-0.5 hover:translate-y-0.5 active:shadow-none active:translate-x-1 active:translate-y-1 transition-all cursor-pointer flex items-center gap-2"
                 >
                   <theme.icon className={theme.color} />
                   {theme.name}
