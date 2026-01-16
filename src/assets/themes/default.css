@@ -12,6 +12,10 @@
   /* Blue 500 */
   --theme-select-indicator: #0f172a;
   /* Slate 900 */
+  --action-create: #3b82f6;
+  --action-edit: #eab308;
+  --action-delete: #ef4444;
+  --action-update: #22c55e;
   background-color: var(--theme-bg);
   box-shadow: 8px 8px 0px #121212;
   /* Sombra dura estilo cómic */

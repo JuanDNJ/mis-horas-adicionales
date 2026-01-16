@@ -12,6 +12,10 @@
   /* Sky 400 */
   --theme-select-indicator: #0ea5e9;
   /* Sky 500 */
+  --action-create: #8b5cf6;
+  --action-edit: #d946ef;
+  --action-delete: #ec4899;
+  --action-update: #6366f1;
   background-color: var(--theme-bg);
   color: var(--theme-color);
 }

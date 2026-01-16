@@ -12,6 +12,10 @@
   /* Red 400 */
   --theme-select-indicator: #ef4444;
   /* Red 500 */
+  --action-create: #b91c1c;
+  --action-edit: #d97706;
+  --action-delete: #7f1d1d;
+  --action-update: #c2410c;
   background-color: var(--theme-bg);
   background-image: url("/themes/diablo/backgrounds/bg_diablo_v2.png");
   color: var(--theme-color);

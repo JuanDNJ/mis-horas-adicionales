@@ -12,6 +12,10 @@
   /* Fuchsia 300 */
   --theme-select-indicator: #c084fc;
   /* Violet 400 */
+  --action-create: #c026d3;
+  --action-edit: #fbbf24;
+  --action-delete: #e11d48;
+  --action-update: #9333ea;
   background-color: var(--theme-bg);
   background-image: url("/themes/rockero/backgrounds/bg_rockero_v2.png");
   color: var(--theme-color);

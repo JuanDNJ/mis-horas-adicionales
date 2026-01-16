@@ -22,6 +22,12 @@
   --color-option-selected: var(--theme-accent);
   --color-select: var(--theme-select-indicator);
   --color-header-bg: var(--theme-header-bg);
+
+  /* Action Colors */
+  --color-action-create: var(--action-create);
+  --color-action-edit: var(--action-edit);
+  --color-action-delete: var(--action-delete);
+  --color-action-update: var(--action-update);
 }
 
 :root {

@@ -12,6 +12,10 @@
   /* Lime 500 */
   --theme-select-indicator: #57534e;
   /* Stone 600 */
+  --action-create: #57534e;
+  --action-edit: #a16207;
+  --action-delete: #78350f;
+  --action-update: #4d7c0f;
   background-color: var(--theme-bg);
   color: var(--theme-color);
 }
