@@ -12,25 +12,25 @@ Una aplicación moderna y flexible construida con **React 19** y **TypeScript** 
 
 ## ✨ Características Principales
 
-*   **⚡ Rendimiento Ultra Rápido**: Impulsado por Vite.
-*   **🎨 Sistema de Temas Avanzado**: Personalización completa de la interfaz con múltiples temas predefinidos (incluyendo modos Diablo, Militar, Rockero y más).
-*   **📱 Diseño Responsive**: Adaptable a cualquier dispositivo.
-*   **🛠️ Stack Moderno**: Utilizando las últimas versiones de React (v19) y React Router (v7).
-*   **💅 Estilizado con Tailwind v4**: Diseño limpio y mantenible.
+- **⚡ Rendimiento Ultra Rápido**: Impulsado por Vite.
+- **🎨 Sistema de Temas Avanzado**: Personalización completa de la interfaz con múltiples temas predefinidos (incluyendo modos Diablo, Militar, Rockero y más).
+- **📱 Diseño Responsive**: Adaptable a cualquier dispositivo.
+- **🛠️ Stack Moderno**: Utilizando las últimas versiones de React (v19) y React Router (v7).
+- **💅 Estilizado con Tailwind v4**: Diseño limpio y mantenible.
 
 ## 🎨 Temas Disponibles
 
 La aplicación cuenta con un selector de temas dinámico que transforma completamente la apariencia de la interfaz:
 
-| Tema | Descripción | Icono |
-|------|-------------|-------|
-| **Default** | Estilo clásico del sistema | 🖥️ |
-| **Light/Dark** | Modos claro y oscuro tradicionales | ☀️/🌙 |
-| **Diablo** | Intensos tonos rojos y oscuros | 🔥 |
-| **Duende del Sur** | Inspiración natural y verde | 🍃 |
-| **Militar** | Estilo táctico y robusto | 🛡️ |
-| **Rockero** | Actitud y colores vibrantes | 🎸 |
-| **Andalucía y más...** | Identidad regional y cultural | 💃 |
+| Tema                   | Descripción                        | Icono |
+| ---------------------- | ---------------------------------- | ----- |
+| **Default**            | Estilo clásico del sistema         | 🖥️    |
+| **Light/Dark**         | Modos claro y oscuro tradicionales | ☀️/🌙 |
+| **Diablo**             | Intensos tonos rojos y oscuros     | 🔥    |
+| **Duende del Sur**     | Inspiración natural y verde        | 🍃    |
+| **Militar**            | Estilo táctico y robusto           | 🛡️    |
+| **Rockero**            | Actitud y colores vibrantes        | 🎸    |
+| **Andalucía y más...** | Identidad regional y cultural      | 💃    |
 
 ## 🚀 Comenzando
 
@@ -38,23 +38,26 @@ Sigue estos pasos para tener el proyecto corriendo en tu máquina local.
 
 ### Prerrequisitos
 
-*   Node.js (versión LTS recomendada)
-*   npm o yarn
+- Node.js (versión LTS recomendada)
+- npm o yarn
 
 ### Instalación
 
 1.  **Clona el repositorio**
+
     ```bash
     git clone https://github.com/JuanDNJ/mis-horas-adicionales.git
     cd horas-adicionales
     ```
 
 2.  **Instala las dependencias**
+
     ```bash
     npm install
     ```
 
 3.  **Inicia el servidor de desarrollo**
+
     ```bash
     npm run dev
     ```
@@ -63,11 +66,11 @@ Sigue estos pasos para tener el proyecto corriendo en tu máquina local.
 
 ## 🛠️ Scripts Disponibles
 
-*   `npm run dev`: Inicia el entorno de desarrollo.
-*   `npm run build`: Compila la aplicación para producción.
-*   `npm run preview`: Previsualiza la build de producción localmente.
-*   `npm run lint`: Ejecuta el linter (ESLint).
-*   `npm run format`: Formatea el código con Prettier.
+- `npm run dev`: Inicia el entorno de desarrollo.
+- `npm run build`: Compila la aplicación para producción.
+- `npm run preview`: Previsualiza la build de producción localmente.
+- `npm run lint`: Ejecuta el linter (ESLint).
+- `npm run format`: Formatea el código con Prettier.
 
 ## 📂 Estructura del Proyecto
 

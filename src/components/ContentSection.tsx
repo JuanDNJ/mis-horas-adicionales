@@ -25,7 +25,7 @@ const ContentSection: FC<ContentSectionProps> = ({
   return (
     <section
       className={cn(
-        `flex flex-col items-center min-h-fit m-auto gap-6 md:gap-10 py-12 px-4 md:px-8 ${bgColor ?? "transparent"}`,
+        `flex flex-col items-center min-h-fit gap-6 md:gap-10 py-12 px-4 md:px-8 ${bgColor ?? "transparent"}`,
         className
       )}
     >
@@ -42,7 +42,7 @@ const ContentSection: FC<ContentSectionProps> = ({
 
       <article
         className={cn(
-          "bg-white rounded-lg shadow-lg w-full max-w-5xl flex flex-col items-center justify-center p-6 md:p-12",
+          "bg-white rounded-lg shadow-lg w-full flex flex-col items-center justify-center p-6 md:p-12",
           cardClassName
         )}
       >

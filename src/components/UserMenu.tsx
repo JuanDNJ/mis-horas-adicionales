@@ -22,7 +22,7 @@ export const UserMenu: FC<UserMenuProps> = ({ className }) => {
   }, []);
 
   return (
-    <div className={cn("relative", className)} ref={dropdownRef}>
+    <section className={cn("relative", className)} ref={dropdownRef}>
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
@@ -41,7 +41,7 @@ export const UserMenu: FC<UserMenuProps> = ({ className }) => {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 z-50 w-56 mt-4 py-3 bg-theme-bg border-2 border-theme-color rounded-lg shadow-[4px_4px_0px_var(--theme-color)] animate-in fade-in zoom-in duration-200 origin-top-right">
+        <article className="absolute right-0 z-50 w-56 mt-4 py-3 bg-theme-bg border-2 border-theme-color rounded-lg shadow-[4px_4px_0px_var(--theme-color)] animate-in fade-in zoom-in duration-200 origin-top-right">
           <div className="px-5 py-3 border-b-2 border-theme-color/20 mb-2">
             <p className="text-sm font-bold text-theme-color">Usuario Invitado</p>
             <p className="text-xs text-secondary">guest@example.com</p>
@@ -67,8 +67,8 @@ export const UserMenu: FC<UserMenuProps> = ({ className }) => {
             <FaSignOutAlt className="text-lg" />
             <span>Cerrar Sesión</span>
           </button>
-        </div>
+        </article>
       )}
-    </div>
+    </section>
   );
 };

@@ -4,6 +4,7 @@ import ContentSection from "@/components/ContentSection";
 import { themes } from "@/config";
 import { useGlobalContext } from "@/hooks/useGlobalContext";
 import { FaAdversal, FaAmilia, FaSatellite } from "react-icons/fa";
+import Main from "./components/Main";
 
 const App = () => {
   const { setSelectedTheme } = useGlobalContext();
@@ -27,10 +28,9 @@ const App = () => {
   return (
     <>
       <Header />
-      <main className="w-full min-h-screen overflow-x-hidden">
+      <Main>
         {/* Hero Section: Main introduction and value proposition */}
         <Hero />
-
         {/* Transparencia Total: Information about pricing and free features for early adopters */}
         <ContentSection
           bgColor="bg-black/80"
@@ -62,7 +62,6 @@ const App = () => {
             </p>
           </div>
         </ContentSection>
-
         {/* Why Choose Us: Feature grid highlighting key advantages */}
         <ContentSection
           bgColor="bg-black/80"
@@ -107,7 +106,6 @@ const App = () => {
             </li>
           </ul>
         </ContentSection>
-
         {/* Call to Action: Encouraging users to start using the app */}
         <ContentSection
           bgColor="bg-black/80"
@@ -125,6 +123,7 @@ const App = () => {
             {/* Themes Showcase: Preview of available themes to engage users visually */}
           </p>
         </ContentSection>
+        {/* Themes Showcase: Preview of available themes to engage users visually */}
         <ContentSection
           title="Dale color a tu rutina"
           actions={
@@ -147,6 +146,7 @@ const App = () => {
             {/* Contact Section: Support information */}
           </p>
         </ContentSection>
+        {/* Contact Section: Support information */}
         <ContentSection title="Contacto">
           <p className="text-center text-lg text-gray-700">
             ¿Tienes preguntas, sugerencias o necesitas ayuda? Nuestro equipo está aquí para ti.
@@ -159,7 +159,7 @@ const App = () => {
             </a>
           </p>
         </ContentSection>
-      </main>
+      </Main>
     </>
   );
 };
