@@ -10,14 +10,14 @@ interface HoursTableProps {
 export const HoursTable = ({ data, onDelete }: HoursTableProps) => {
   if (data.length === 0) {
     return (
-      <div className="w-full text-center p-8 border-4 border-black border-dashed bg-white/30 rounded-sm mt-8">
+      <div className="w-full text-center p-8 border-4 border-black border-dashed bg-white/30 rounded-sm">
         <p className="text-xl font-bold text-secondary uppercase">No hay registros aún</p>
       </div>
     );
   }
 
   return (
-    <div className="w-full mt-8 space-y-4">
+    <div className="w-full space-y-4">
       <h2 className="text-2xl font-black uppercase text-theme-color mb-4 drop-shadow-sm border-b-4 border-black inline-block pr-8">
         Registros Guardados
       </h2>

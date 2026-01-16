@@ -1,5 +1,17 @@
-import type { ChangeEvent, InputHTMLAttributes, ReactNode, Dispatch, SetStateAction } from "react";
+import {
+  type ChangeEvent,
+  type InputHTMLAttributes,
+  type ReactNode,
+  type Dispatch,
+  type SetStateAction,
+  useState,
+} from "react";
 import { cn } from "@/lib/utils";
+import { Calendar } from "@/components/Calendar";
+import { Popover } from "@/components/Popover";
+import { FaCalendarAlt } from "react-icons/fa";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
 
 export interface HoursData {
   empresa: string;
@@ -63,21 +75,40 @@ const Input = ({ label, className, containerClassName, ...props }: InputProps) =
   </div>
 );
 
-export const HoursForm = ({ formData, onChange }: HoursFormProps) => {
-  // Helper to handle date change from a single date picker to split fields
-  const handleDateChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const date = new Date(e.target.value);
-    if (!isNaN(date.getTime())) {
-      // Create synthetic events or call onChange directly if possible,
-      // but here we need to update 3 fields.
-      // Since specific implementation might vary, let's rely on individual inputs or
-      // trust the user to fill them.
-      // Ideally we would accept a setFormData prop to batch update,
-      // but for strict adherence to the requested props, I will add a hidden date input
-      // that updates the view but the state needs to be managed one by one.
-      // Actually, let's just use 3 inputs for now as requested by the data structure.
+export const HoursForm = ({ formData, onChange, setFormData }: HoursFormProps) => {
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+
+  // Helper to handle date selection from Calendar
+  const handleDateSelect = (date: Date | undefined) => {
+    if (date && setFormData) {
+      setFormData((prev) => ({
+        ...prev,
+        dia: format(date, "dd"),
+        mes: format(date, "MM"),
+        anio: format(date, "yyyy"),
+      }));
+      setIsCalendarOpen(false);
     }
   };
+
+  // Helper to get selected date object from form data
+  const getSelectedDate = () => {
+    if (formData.dia && formData.mes && formData.anio) {
+      return new Date(Number(formData.anio), Number(formData.mes) - 1, Number(formData.dia));
+    }
+    return undefined;
+  };
+
+  const formattedDateDisplay =
+    formData.dia && formData.mes && formData.anio
+      ? format(
+          new Date(Number(formData.anio), Number(formData.mes) - 1, Number(formData.dia)),
+          "PPP",
+          {
+            locale: es,
+          }
+        )
+      : "Selecciona una fecha";
 
   return (
     <div className="w-full max-w-4xl mx-auto p-4 md:p-8 bg-header-bg border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] space-y-6">
@@ -140,35 +171,38 @@ export const HoursForm = ({ formData, onChange }: HoursFormProps) => {
         </InputGroup>
 
         {/* Fecha */}
-        <InputGroup label="Fecha del Registro">
-          <Input
-            label="Día"
-            name="dia"
-            value={formData.dia}
-            onChange={onChange}
-            placeholder="DD"
-            maxLength={2}
-            className="text-center"
-          />
-          <Input
-            label="Mes"
-            name="mes"
-            value={formData.mes}
-            onChange={onChange}
-            placeholder="MM"
-            className="text-center"
-          />
-          <Input
-            label="Año"
-            name="anio"
-            value={formData.anio}
-            onChange={onChange}
-            placeholder="YYYY"
-            maxLength={4}
-            className="text-center"
-          />
-          <div className="col-span-1 md:col-span-3 lg:col-span-3 flex items-center gap-2 bg-yellow-100/50 border-2 border-dashed border-yellow-600 p-2 text-yellow-800 text-xs font-bold">
-            <span>ℹ️</span> Ingresa la fecha manualmente en formato numérico.
+        <InputGroup label="Fecha del Registro" className="relative z-10">
+          <div className="col-span-1 md:col-span-2 lg:col-span-3">
+            <label className="text-xs font-bold text-secondary uppercase tracking-wider ml-1 mb-1 block">
+              Seleccionar Fecha
+            </label>
+            <Popover
+              isOpen={isCalendarOpen}
+              onOpenChange={setIsCalendarOpen}
+              trigger={
+                <div
+                  className={cn(
+                    "w-full px-3 py-2 bg-theme-bg border-2 border-black text-theme-color cursor-pointer flex items-center justify-between transition-all duration-200 font-bold hover:bg-theme-secondary/10",
+                    isCalendarOpen
+                      ? "shadow-[4px_4px_0px_0px_var(--theme-accent)] border-theme-accent"
+                      : ""
+                  )}
+                >
+                  <span className={!formData.dia ? "text-secondary/60" : ""}>
+                    {formattedDateDisplay}
+                  </span>
+                  <FaCalendarAlt className="text-secondary" />
+                </div>
+              }
+              content={
+                <Calendar
+                  mode="single"
+                  selected={getSelectedDate()}
+                  onSelect={handleDateSelect}
+                  initialFocus
+                />
+              }
+            />
           </div>
         </InputGroup>
 
