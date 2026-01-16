@@ -48,7 +48,7 @@ const RecordDetail = () => {
     if (!record) return;
     const { name, value } = e.target;
 
-    setRecord((prev) => {
+    setRecord((prev: HoursData | null) => {
       if (!prev) return null;
       const newData = { ...prev, [name]: value };
       if (name === "hora_entrada" || name === "hora_salida") {

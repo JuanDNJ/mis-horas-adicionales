@@ -6,10 +6,17 @@ import { HoursTable } from "@/components/HoursTable";
 import { DashboardToolbar } from "@/components/DashboardToolbar";
 import { FaPlus, FaTimes } from "react-icons/fa";
 import { calculateDuration, cn } from "@/lib/utils";
+import { useUserProfile } from "@/hooks/useUserProfile";
 
 const Dashboard = () => {
+  const { userProfile } = useUserProfile();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
+
+  // Determinar si el perfil está completo
+  const isProfileIncomplete =
+    !userProfile || !userProfile.jobTitle || !userProfile.sector || !userProfile.employeeId;
+
   const [horas, setHoras] = useState<HoursData[]>(() => {
     const saved = localStorage.getItem("horas-data");
     return saved ? JSON.parse(saved) : [];
@@ -38,7 +45,7 @@ const Dashboard = () => {
 
   const handleHoursChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setMisHoras((prev) => {
+    setMisHoras((prev: HoursData) => {
       const newData = { ...prev, [name]: value };
       if (name === "hora_entrada" || name === "hora_salida") {
         if (newData.hora_entrada && newData.hora_salida) {
@@ -134,7 +141,11 @@ const Dashboard = () => {
       <Header />
       <Main>
         <div className="w-full flex flex-col py-8 px-4">
-          <DashboardToolbar isFormOpen={isFormOpen} onToggleForm={handleToggleForm} />
+          <DashboardToolbar
+            isFormOpen={isFormOpen}
+            onToggleForm={handleToggleForm}
+            isAddDisabled={isProfileIncomplete}
+          />
 
           <div className="flex flex-col xl:flex-row items-start justify-center w-full gap-8">
             {/* Form Column - Conditional Rendering with Modal for Mobile */}

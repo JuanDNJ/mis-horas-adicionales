@@ -1,13 +1,16 @@
 import { useState, useRef, useEffect, type FC } from "react";
-import { FaUserCircle, FaSignOutAlt, FaUser } from "react-icons/fa";
+import { FaUserCircle, FaUser } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { useProfileContext } from "@/hooks/useProfileContext";
+import { SignOut } from "./SignOut";
 
 interface UserMenuProps {
   className?: string;
 }
 
 export const UserMenu: FC<UserMenuProps> = ({ className }) => {
+  const { isAuthenticated, photoURL, displayName, email } = useProfileContext();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -20,6 +23,8 @@ export const UserMenu: FC<UserMenuProps> = ({ className }) => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  if (!isAuthenticated) return null;
 
   return (
     <section className={cn("relative", className)} ref={dropdownRef}>
@@ -37,14 +42,24 @@ export const UserMenu: FC<UserMenuProps> = ({ className }) => {
         )}
         aria-label="User menu"
       >
-        <FaUserCircle className="text-2xl md:text-3xl text-theme-color" />
+        {photoURL ? (
+          <img
+            src={photoURL}
+            alt={displayName || "User Avatar"}
+            className="w-8 h-8 md:w-9 md:h-9 rounded-full object-cover"
+          />
+        ) : (
+          <FaUserCircle className="text-2xl md:text-3xl text-theme-color" />
+        )}
       </button>
 
       {isOpen && (
         <article className="absolute right-0 z-50 w-56 mt-4 py-3 bg-theme-bg border-2 border-theme-color rounded-lg shadow-[4px_4px_0px_var(--theme-color)] animate-in fade-in zoom-in duration-200 origin-top-right">
           <div className="px-5 py-3 border-b-2 border-theme-color/20 mb-2">
-            <p className="text-sm font-bold text-theme-color">Usuario Invitado</p>
-            <p className="text-xs text-secondary">guest@example.com</p>
+            <p className="text-sm font-bold text-theme-color truncate">
+              {displayName || "Usuario"}
+            </p>
+            <p className="text-xs text-secondary truncate">{email}</p>
           </div>
 
           <Link
@@ -56,17 +71,7 @@ export const UserMenu: FC<UserMenuProps> = ({ className }) => {
             <span>Perfil</span>
           </Link>
 
-          <button
-            onClick={() => {
-              setIsOpen(false);
-              // Lógica de logout aquí
-              console.log("Logout clicked");
-            }}
-            className="w-full flex items-center gap-3 px-4 py-2 hover:bg-red-500/10 hover:text-red-600 transition-colors text-theme-color font-medium text-left"
-          >
-            <FaSignOutAlt className="text-lg" />
-            <span>Cerrar Sesión</span>
-          </button>
+          <SignOut onAction={() => setIsOpen(false)} />
         </article>
       )}
     </section>

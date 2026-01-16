@@ -1,0 +1,1 @@
+import{at as e}from"./vendor-5br9Pmv5.js";import{i as t}from"./index-CLUmCb58.js";var n=e();const r=()=>{let e=(0,n.useContext)(t);if(e===void 0)throw Error(`useUserProfile debe ser usado dentro de un ProfileProvider`);return e};export{r as t};

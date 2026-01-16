@@ -5,6 +5,7 @@ import {
   type Dispatch,
   type SetStateAction,
   useState,
+  useEffect,
 } from "react";
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/Calendar";
@@ -12,6 +13,7 @@ import { Popover } from "@/components/Popover";
 import { FaCalendarAlt } from "react-icons/fa";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { useUserProfile } from "@/hooks/useUserProfile";
 
 export interface HoursData {
   empresa: string;
@@ -113,11 +115,23 @@ const SectorNavigation = ({
 );
 
 export const HoursForm = ({ formData, onChange, setFormData }: HoursFormProps) => {
+  const { userProfile } = useUserProfile();
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-  // Initialize from formData.ramo/origin if present, otherwise default to general
-  const [sector, setSector] = useState<"general" | "transport">(() => {
-    return formData.ramo || formData.origen || formData.destino ? "transport" : "general";
-  });
+
+  // Calculate sector based on formData and userProfile
+  const hasTransportData = formData.ramo || formData.origen || formData.destino;
+  const calculatedSector: "general" | "transport" = hasTransportData
+    ? "transport"
+    : userProfile?.sector === "Transporte"
+      ? "transport"
+      : "general";
+
+  const [sector, setSector] = useState<"general" | "transport">(calculatedSector);
+
+  // Update sector only when calculatedSector changes
+  useEffect(() => {
+    setSector(calculatedSector);
+  }, [calculatedSector]);
 
   // Helper to handle date selection from Calendar
   const handleDateSelect = (date: Date | undefined) => {
