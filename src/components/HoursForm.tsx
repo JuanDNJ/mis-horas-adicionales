@@ -114,14 +114,14 @@ const SectorNavigation = ({
 );
 
 export const HoursForm = ({ formData, onChange, setFormData }: HoursFormProps) => {
-  const { userProfile } = useUserProfile();
+  const { userProfile, activeJobProfile } = useUserProfile();
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
-  // Calculate sector based on formData and userProfile
+  // Calculate sector based on formData and active Job Profile
   const hasTransportData = formData.origen || formData.destino;
   const calculatedSector: "general" | "transport" = hasTransportData
     ? "transport"
-    : userProfile?.sector === "Transporte"
+    : activeJobProfile?.sector === "Transporte"
       ? "transport"
       : "general";
 
@@ -132,12 +132,12 @@ export const HoursForm = ({ formData, onChange, setFormData }: HoursFormProps) =
     setSector(calculatedSector);
   }, [calculatedSector]);
 
-  // Autocomplete form data from user profile on mount
+  // Autocomplete form data from user profile AND active job profile on mount
   useEffect(() => {
     if (userProfile && setFormData) {
       setFormData((prev) => {
         // Only autocomplete if main fields are empty (new record)
-        if (prev.nombre || prev.numero_empleado) {
+        if (prev.nombre) {
           return prev;
         }
 
@@ -166,15 +166,16 @@ export const HoursForm = ({ formData, onChange, setFormData }: HoursFormProps) =
 
         return {
           ...prev,
-          numero_empleado: userProfile.employeeId || "",
-          telefono: userProfile.phoneNumber || "",
+          numero_empleado: activeJobProfile?.employeeId || prev.numero_empleado || "",
+          empresa: activeJobProfile?.companyName || prev.empresa || "",
+          telefono: userProfile.phoneNumber || prev.telefono || "",
           nombre: nombre,
           apellido_paterno: apellido_paterno,
           apellido_materno: apellido_materno,
         };
       });
     }
-  }, [userProfile, setFormData]);
+  }, [userProfile, activeJobProfile, setFormData]);
 
   // Helper to handle date selection from Calendar
   const handleDateSelect = (date: Date | undefined) => {

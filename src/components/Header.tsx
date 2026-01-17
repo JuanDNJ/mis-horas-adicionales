@@ -5,12 +5,15 @@ import { HeaderControls } from "./HeaderControls";
 import { HeaderLogo } from "./HeaderLogo";
 import { GoogleAcces } from "./GoogleAcces";
 import { useProfileContext } from "@/hooks/useProfileContext";
+import { useUserProfile } from "@/hooks/useUserProfile";
 import { cn } from "@/lib/utils";
+import { Briefcase } from "lucide-react";
 
 const Header: FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { isAuthenticated } = useProfileContext();
+  const { activeJobProfile } = useUserProfile();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -36,6 +39,18 @@ const Header: FC = () => {
 
       {/* Right Section: Theme Selector + User Menu + Google Access */}
       <div className="flex items-center gap-2 md:gap-4">
+        {/* Active Company Indicator (Desktop) */}
+        {isAuthenticated && activeJobProfile && (
+          <div className="hidden lg:flex flex-col items-end mr-2 px-3 py-1 bg-white/50 border-2 border-black rounded shadow-[2px_2px_0_0_rgba(0,0,0,1)]">
+            <span className="text-[10px] font-bold uppercase text-gray-500 leading-none mb-0.5">
+              Trabajando en
+            </span>
+            <span className="font-black uppercase text-xs leading-none flex items-center gap-1">
+              <Briefcase size={12} /> {activeJobProfile.companyName}
+            </span>
+          </div>
+        )}
+
         <HeaderControls />
         {!isAuthenticated && <GoogleAcces />}
       </div>
