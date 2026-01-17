@@ -1,14 +1,13 @@
 import Header from "@/components/Header";
 import Main from "@/components/Main";
-import { type FC, useState, useEffect, useMemo, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import { Save, User, Building2, Briefcase, Hash, Phone, Camera } from "lucide-react";
+import { type FC, useState, useEffect, useRef } from "react";
+import { Save, User, Briefcase, Hash, Camera, Plus, Trash2, Edit, Check, Star } from "lucide-react";
 import { useProfileContext } from "@/hooks/useProfileContext";
-import { useUserProfile } from "@/hooks/useUserProfile";
 import { storage, auth } from "@/lib/firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import type { JobProfile } from "@/context/types/index";
 
-// Función para comprimir y redimensionar imagen
+// Función para comprimir y redimensionar imagen (Mantenida igual)
 const compressImage = (file: File): Promise<File> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -17,15 +16,11 @@ const compressImage = (file: File): Promise<File> => {
       const img = new Image();
       img.src = event.target?.result as string;
       img.onload = () => {
-        // Configuración de compresión
         const MAX_WIDTH = 800;
         const MAX_HEIGHT = 800;
         const QUALITY = 0.8;
-
         let width = img.width;
         let height = img.height;
-
-        // Redimensionar si es necesario manteniendo aspect ratio
         if (width > height) {
           if (width > MAX_WIDTH) {
             height = (height * MAX_WIDTH) / width;
@@ -37,27 +32,21 @@ const compressImage = (file: File): Promise<File> => {
             height = MAX_HEIGHT;
           }
         }
-
-        // Crear canvas y comprimir
         const canvas = document.createElement("canvas");
         canvas.width = width;
         canvas.height = height;
         const ctx = canvas.getContext("2d");
-
         if (!ctx) {
           reject(new Error("No se pudo crear el contexto del canvas"));
           return;
         }
-
         ctx.drawImage(img, 0, 0, width, height);
-
         canvas.toBlob(
           (blob) => {
             if (!blob) {
               reject(new Error("Error al comprimir la imagen"));
               return;
             }
-            // Crear nuevo File con el blob comprimido
             const compressedFile = new File([blob], file.name, {
               type: "image/jpeg",
               lastModified: Date.now(),
@@ -75,63 +64,71 @@ const compressImage = (file: File): Promise<File> => {
 };
 
 const CreateProfile: FC = () => {
-  const { displayName, photoURL: authPhotoURL } = useProfileContext();
-  const { userProfile, updateProfile, isLoading: isSaving } = useUserProfile();
-  const navigate = useNavigate();
+  const {
+    userProfile,
+    jobProfiles,
+    activeJobProfile,
+    updateUserProfile,
+    addJobProfile,
+    updateJobProfile,
+    deleteJobProfile,
+  } = useProfileContext();
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Estado para la foto
-  const [photoURL, setPhotoURL] = useState<string>(userProfile?.photoURL || authPhotoURL || "");
+  // --- States ---
+
+  // 1. Datos Personales
+  const [photoURL, setPhotoURL] = useState<string>(userProfile?.photoURL || "");
+  const [personalData, setPersonalData] = useState({
+    displayName: userProfile?.displayName || "",
+    phoneNumber: userProfile?.phoneNumber || "",
+  });
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
-  // Calcular valores iniciales del formulario
-  const initialFormData = useMemo(
-    () => ({
-      displayName: userProfile?.displayName || displayName || "",
-      jobTitle: userProfile?.jobTitle || "",
-      sector: userProfile?.sector || "",
-      employeeId: userProfile?.employeeId || "",
-      phoneNumber: userProfile?.phoneNumber || "",
-    }),
-    [userProfile, displayName]
-  );
+  // 2. Gestión de Jobs
+  const [isEditingJob, setIsEditingJob] = useState(false);
+  const [jobFormErrors, setJobFormErrors] = useState<string | null>(null);
+  const [currentJobId, setCurrentJobId] = useState<string | null>(null); // null = creando nuevo
+  const [jobData, setJobData] = useState({
+    companyName: "",
+    jobTitle: "",
+    employeeId: "",
+    sector: "General" as "General" | "Transporte",
+  });
 
-  // Estado local
-  const [formData, setFormData] = useState(initialFormData);
+  // --- Effects ---
 
-  // Actualizar formData cuando cambie el perfil
+  // Sincronizar estado local con contexto si carga después
   useEffect(() => {
-    setFormData(initialFormData);
-  }, [initialFormData]);
-
-  // Actualizar foto cuando cambie el perfil
-  useEffect(() => {
-    if (userProfile?.photoURL) {
-      setPhotoURL(userProfile.photoURL);
-    } else if (authPhotoURL) {
-      setPhotoURL(authPhotoURL);
+    if (userProfile) {
+      setPersonalData({
+        displayName: userProfile.displayName || "",
+        phoneNumber: userProfile.phoneNumber || "",
+      });
+      setPhotoURL(userProfile.photoURL || "");
     }
-  }, [userProfile?.photoURL, authPhotoURL]);
+  }, [userProfile]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  // --- Handlers Personales ---
+
+  const handlePersonalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setPersonalData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validar tipo de archivo con lista blanca
     const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
     if (!allowedTypes.includes(file.type)) {
       alert("Solo se permiten imágenes JPG, PNG o WebP");
       return;
     }
 
-    // Validar tamaño inicial (max 10MB antes de comprimir)
     if (file.size > 10 * 1024 * 1024) {
-      alert("La imagen es demasiado grande. Por favor selecciona una imagen menor a 10MB");
+      alert("La imagen es demasiado grande. Max 10MB");
       return;
     }
 
@@ -140,212 +137,400 @@ const CreateProfile: FC = () => {
       const currentUser = auth.currentUser;
       if (!currentUser) throw new Error("Usuario no autenticado");
 
-      // Comprimir y redimensionar imagen
       const compressedFile = await compressImage(file);
-
-      // Validar tamaño final después de comprimir (max 2MB)
       if (compressedFile.size > 2 * 1024 * 1024) {
-        alert("La imagen sigue siendo muy pesada después de comprimirse. Intenta con otra imagen.");
-        setUploadingPhoto(false);
+        alert("La imagen sigue siendo muy pesada. Intenta con otra.");
         return;
       }
 
-      // Crear referencia única en Storage
       const storageRef = ref(
         storage,
         `profile-photos/${currentUser.uid}/${Date.now()}_${file.name}`
       );
-
-      // Subir archivo comprimido
       await uploadBytes(storageRef, compressedFile);
-
-      // Obtener URL de descarga
       const downloadURL = await getDownloadURL(storageRef);
-
-      // Actualizar estado local
       setPhotoURL(downloadURL);
+
+      // Guardar inmediatamente la foto en el perfil si ya existe
+      if (userProfile) {
+        await updateUserProfile({ photoURL: downloadURL });
+      }
     } catch (error) {
       console.error("Error al subir foto:", error);
-      alert("Error al subir la foto. Intenta nuevamente.");
+      alert("Error al subir la foto.");
     } finally {
       setUploadingPhoto(false);
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const savePersonalData = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await updateProfile({
-        displayName: formData.displayName,
-        jobTitle: formData.jobTitle,
-        sector: formData.sector,
-        employeeId: formData.employeeId,
-        phoneNumber: formData.phoneNumber,
-        photoURL: photoURL || "", // Aseguramos que la foto se guarde
+      await updateUserProfile({
+        displayName: personalData.displayName,
+        phoneNumber: personalData.phoneNumber,
+        photoURL: photoURL,
       });
-      navigate("/profile");
+      alert("Datos personales actualizados.");
     } catch (error) {
-      console.error("Error al guardar:", error);
-      alert("Error al guardar el perfil. Intenta nuevamente.");
+      console.error("Error al guardar personal:", error);
+      alert("Error al guardar datos personales.");
     }
+  };
+
+  // --- Handlers Jobs ---
+
+  const openNewJobForm = () => {
+    setJobData({
+      companyName: "",
+      jobTitle: "",
+      employeeId: "",
+      sector: "General",
+    });
+    setCurrentJobId(null);
+    setIsEditingJob(true);
+    setJobFormErrors(null);
+  };
+
+  const openEditJobForm = (job: JobProfile) => {
+    setJobData({
+      companyName: job.companyName,
+      jobTitle: job.jobTitle,
+      employeeId: job.employeeId,
+      sector: job.sector,
+    });
+    setCurrentJobId(job.id);
+    setIsEditingJob(true);
+    setJobFormErrors(null);
+  };
+
+  const handleJobSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setJobFormErrors(null);
+
+    // Validación básica
+    if (!jobData.companyName.trim()) {
+      setJobFormErrors("El nombre de la empresa es obligatorio.");
+      return;
+    }
+
+    try {
+      if (currentJobId) {
+        // Editando
+        await updateJobProfile(currentJobId, jobData);
+      } else {
+        // Creando
+        await addJobProfile(jobData);
+      }
+      setIsEditingJob(false);
+    } catch (error) {
+      console.error("Error saving job:", error);
+      setJobFormErrors("Error al guardar el empleo.");
+    }
+  };
+
+  const handleDeleteJob = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (confirm("¿Seguro que quieres eliminar este perfil de trabajo?")) {
+      try {
+        await deleteJobProfile(id);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          alert(error.message);
+        }
+      }
+    }
+  };
+
+  const handleSetDefault = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    // Al establecer como default NO actualizamos el timestamp (gracias al cambio en Context)
+    // por lo que NO cambiará el "Último Activo"
+    await updateJobProfile(id, { isDefault: true });
   };
 
   return (
     <>
       <Header />
       <Main>
-        <div className="w-full max-w-2xl mx-auto p-4 md:p-6 font-mono">
-          {/* Título de Página Estilo Comic */}
+        <div className="w-full max-w-4xl mx-auto p-4 md:p-6 font-mono pb-20">
           <div className="mb-8 text-center relative">
             <h1 className="text-4xl md:text-5xl font-black uppercase italic tracking-tighter text-black drop-shadow-[3px_3px_0_rgba(255,255,255,1)]">
-              {userProfile ? "Editar Perfil" : "Crear Perfil"}
+              Mi Perfil
             </h1>
-            <div className="absolute -top-4 -right-2 md:right-10 rotate-12 bg-cyan-400 border-4 border-black px-3 py-1 text-sm font-bold shadow-[4px_4px_0_0_#000]">
-              {userProfile ? "Actualizar" : "¡Nuevo!"}
-            </div>
           </div>
 
-          <div className="relative">
-            <div className="absolute inset-0 bg-black translate-x-3 translate-y-3 rounded-xl"></div>
-            <form
-              onSubmit={handleSubmit}
-              className="relative bg-white border-4 border-black p-6 md:p-8 rounded-xl flex flex-col gap-6"
-            >
-              {/* Sección Foto - Ahora editable */}
-              <div className="flex justify-center mb-4">
-                <div className="relative group">
-                  <div className="w-32 h-32 bg-slate-200 border-4 border-black rounded-full overflow-hidden relative cursor-pointer hover:opacity-90 transition-opacity">
-                    {uploadingPhoto ? (
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-                        <div className="text-white font-bold text-sm">Subiendo...</div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+            {/* Lado Izquierdo: Datos Personales */}
+            <div className="lg:col-span-1">
+              <div className="relative">
+                <div className="absolute inset-0 bg-black translate-x-2 translate-y-2 rounded-xl"></div>
+                <div className="relative bg-white border-4 border-black p-6 rounded-xl flex flex-col gap-6">
+                  {/* Foto */}
+                  <div className="flex justify-center">
+                    <div className="relative group">
+                      <div className="w-32 h-32 bg-slate-200 border-4 border-black rounded-full overflow-hidden relative cursor-pointer">
+                        {uploadingPhoto ? (
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/50 text-white font-bold text-xs">
+                            Subiendo...
+                          </div>
+                        ) : photoURL ? (
+                          <img
+                            src={photoURL}
+                            alt="Profile"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <User
+                            size={64}
+                            className="text-slate-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+                          />
+                        )}
+                        <div
+                          className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={() => fileInputRef.current?.click()}
+                        >
+                          <Camera className="text-white" size={32} />
+                        </div>
                       </div>
-                    ) : photoURL ? (
-                      <img src={photoURL} alt="Profile" className="w-full h-full object-cover" />
-                    ) : (
-                      <User
-                        size={64}
-                        className="text-slate-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handlePhotoChange}
+                        className="hidden"
                       />
-                    )}
-                    {/* Overlay hover */}
-                    <div
-                      className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                      onClick={() => fileInputRef.current?.click()}
-                    >
-                      <Camera className="text-white" size={32} />
                     </div>
                   </div>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handlePhotoChange}
-                    className="hidden"
-                  />
-                  {/* Botón de cámara */}
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="absolute -bottom-2 -right-2 bg-cyan-400 hover:bg-cyan-500 border-4 border-black rounded-full p-2 shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] transition-all"
-                  >
-                    <Camera size={20} />
-                  </button>
-                </div>
-              </div>
 
-              <div className="space-y-4">
-                <div className="flex flex-col gap-2">
-                  <label className="font-black uppercase text-sm flex items-center gap-2">
-                    <User size={18} /> Nombre Completo
-                  </label>
-                  <input
-                    type="text"
-                    name="displayName"
-                    value={formData.displayName}
-                    onChange={handleChange}
-                    className="w-full bg-yellow-100 border-4 border-black p-3 font-bold focus:outline-none focus:bg-yellow-200 focus:shadow-[4px_4px_0_0_#000] transition-all"
-                    placeholder="Tu nombre..."
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="flex flex-col gap-2">
-                    <label className="font-black uppercase text-sm flex items-center gap-2">
-                      <Briefcase size={18} /> Cargo / Puesto
-                    </label>
-                    <input
-                      type="text"
-                      name="jobTitle"
-                      value={formData.jobTitle}
-                      onChange={handleChange}
-                      className="w-full bg-white border-4 border-black p-3 font-bold focus:outline-none focus:bg-cyan-100 focus:shadow-[4px_4px_0_0_#000] transition-all"
-                      placeholder="Ej. Diseñador"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <label className="font-black uppercase text-sm flex items-center gap-2">
-                      <Building2 size={18} /> Sector
-                    </label>
-                    <select
-                      name="sector"
-                      value={formData.sector}
-                      onChange={handleChange}
-                      className="w-full bg-white border-4 border-black p-3 font-bold focus:outline-none focus:bg-cyan-100 focus:shadow-[4px_4px_0_0_#000] transition-all appearance-none cursor-pointer"
+                  <form onSubmit={savePersonalData} className="flex flex-col gap-4">
+                    <div>
+                      <label className="font-black uppercase text-xs mb-1 block">
+                        Nombre Completo
+                      </label>
+                      <input
+                        type="text"
+                        name="displayName"
+                        value={personalData.displayName}
+                        onChange={handlePersonalChange}
+                        className="w-full bg-yellow-100 border-2 border-black p-2 font-bold focus:outline-none focus:shadow-[2px_2px_0_0_#000]"
+                        placeholder="Tu nombre..."
+                      />
+                    </div>
+                    <div>
+                      <label className="font-black uppercase text-xs mb-1 block">Teléfono</label>
+                      <input
+                        type="tel"
+                        name="phoneNumber"
+                        value={personalData.phoneNumber}
+                        onChange={handlePersonalChange}
+                        className="w-full bg-white border-2 border-black p-2 font-bold focus:outline-none focus:shadow-[2px_2px_0_0_#000]"
+                        placeholder="+34..."
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      className="bg-cyan-400 text-black font-bold py-2 border-2 border-black shadow-[3px_3px_0_0_#000] hover:translate-y-0.5 hover:shadow-[1px_1px_0_0_#000] active:translate-y-1 active:shadow-none transition-all flex justify-center items-center gap-2"
                     >
-                      <option value="">Seleccionar...</option>
-                      <option value="Tecnología">Tecnología</option>
-                      <option value="Recursos Humanos">Recursos Humanos</option>
-                      <option value="Operaciones">Operaciones</option>
-                      <option value="Ventas">Ventas</option>
-                      <option value="Transporte">Transporte</option>
-                      <option value="Otro">Otro</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <label className="font-black uppercase text-sm flex items-center gap-2">
-                    <Hash size={18} /> ID de Empleado
-                  </label>
-                  <input
-                    type="text"
-                    name="employeeId"
-                    value={formData.employeeId}
-                    onChange={handleChange}
-                    className="w-full bg-white border-4 border-black p-3 font-bold focus:outline-none focus:bg-cyan-100 focus:shadow-[4px_4px_0_0_#000] transition-all"
-                    placeholder="Ej. EMP-001"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <label className="font-black uppercase text-sm flex items-center gap-2">
-                    <Phone size={18} /> Telefono
-                  </label>
-                  <input
-                    type="tel"
-                    name="phoneNumber"
-                    value={formData.phoneNumber}
-                    onChange={handleChange}
-                    className="w-full bg-white border-4 border-black p-3 font-bold focus:outline-none focus:bg-cyan-100 focus:shadow-[4px_4px_0_0_#000] transition-all"
-                    placeholder="Ej. +34 600 000 000"
-                  />
+                      <Save size={16} /> Guardar Personal
+                    </button>
+                  </form>
                 </div>
               </div>
+            </div>
 
-              <button
-                type="submit"
-                disabled={isSaving}
-                className="mt-4 bg-red-500 hover:bg-red-400 disabled:bg-gray-400 text-white font-black uppercase text-xl py-4 border-4 border-black shadow-[6px_6px_0_0_#000] hover:translate-x-1 hover:translate-y-1 hover:shadow-[2px_2px_0_0_#000] transition-all flex items-center justify-center gap-3 cursor-pointer"
-              >
-                {isSaving ? (
-                  "Guardando..."
-                ) : (
-                  <>
-                    <Save size={24} /> Guardar Perfil
-                  </>
+            {/* Lado Derecho: Mis Empleos */}
+            <div className="lg:col-span-2">
+              <div className="flex justify-between items-end mb-4">
+                <h2 className="text-2xl font-black uppercase italic bg-yellow-300 px-2 border-2 border-black inline-block shadow-[3px_3px_0_0_#000]">
+                  Mis Empleos
+                </h2>
+                {!isEditingJob && (
+                  <button
+                    onClick={openNewJobForm}
+                    className="bg-green-500 text-white font-bold px-3 py-1 border-2 border-black shadow-[3px_3px_0_0_#000] hover:-translate-y-1 active:translate-y-0 transition-all flex items-center gap-1 text-sm"
+                  >
+                    <Plus size={16} /> Añadir Empleo
+                  </button>
                 )}
-              </button>
-            </form>
+              </div>
+
+              {isEditingJob ? (
+                // --- Formulario de Trabajo ---
+                <div className="relative animate-in fade-in slide-in-from-bottom-4">
+                  <div className="absolute inset-0 bg-black translate-x-3 translate-y-3 rounded-xl"></div>
+                  <form
+                    onSubmit={handleJobSubmit}
+                    className="relative bg-white border-4 border-black p-6 rounded-xl flex flex-col gap-4"
+                  >
+                    <h3 className="font-black text-xl uppercase border-b-2 border-black pb-2 mb-2">
+                      {currentJobId ? "Editar Empleo" : "Nuevo Empleo"}
+                    </h3>
+
+                    {jobFormErrors && (
+                      <div className="bg-red-100 border-2 border-red-500 text-red-700 p-2 font-bold text-sm">
+                        {jobFormErrors}
+                      </div>
+                    )}
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="font-bold text-sm mb-1 block">Empresa *</label>
+                        <input
+                          autoFocus
+                          type="text"
+                          value={jobData.companyName}
+                          onChange={(e) => setJobData({ ...jobData, companyName: e.target.value })}
+                          className="w-full border-2 border-black p-2 font-bold"
+                          placeholder="Nombre de la empresa"
+                        />
+                      </div>
+                      <div>
+                        <label className="font-bold text-sm mb-1 block">Cargo / Puesto</label>
+                        <input
+                          type="text"
+                          value={jobData.jobTitle}
+                          onChange={(e) => setJobData({ ...jobData, jobTitle: e.target.value })}
+                          className="w-full border-2 border-black p-2 font-bold"
+                          placeholder="Ej. Conductor, Admin..."
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="font-bold text-sm mb-1 block">No. Empleado</label>
+                        <input
+                          type="text"
+                          value={jobData.employeeId}
+                          onChange={(e) => setJobData({ ...jobData, employeeId: e.target.value })}
+                          className="w-full border-2 border-black p-2 font-bold"
+                          placeholder="ID numérico o alfa"
+                        />
+                      </div>
+                      <div>
+                        <label className="font-bold text-sm mb-1 block">Sector</label>
+                        <select
+                          value={jobData.sector}
+                          onChange={(e) =>
+                            setJobData({
+                              ...jobData,
+                              sector: e.target.value as "General" | "Transporte",
+                            })
+                          }
+                          className="w-full border-2 border-black p-2 font-bold cursor-pointer"
+                        >
+                          <option value="General">General</option>
+                          <option value="Transporte">Transporte</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-4 mt-4">
+                      <button
+                        type="submit"
+                        className="flex-1 bg-black text-white font-bold py-3 hover:bg-gray-800 transition-colors"
+                      >
+                        {currentJobId ? "Actualizar Empleo" : "Guardar Empleo"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setIsEditingJob(false)}
+                        className="flex-1 bg-white border-2 border-black text-black font-bold py-3 hover:bg-gray-100 transition-colors"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              ) : (
+                // --- Lista de Trabajos ---
+                <div className="flex flex-col gap-4">
+                  {jobProfiles.length === 0 ? (
+                    <div className="bg-gray-100 border-2 border-dashed border-gray-400 p-8 text-center text-gray-500 rounded-lg">
+                      No tienes empleos registrados. ¡Añade uno para empezar a fichar!
+                    </div>
+                  ) : (
+                    jobProfiles.map((job) => (
+                      <div
+                        key={job.id}
+                        className={`relative group transition-transform hover:-translate-y-1 duration-200 ${activeJobProfile?.id === job.id ? "z-10" : ""}`}
+                      >
+                        {/* Sombra */}
+                        <div
+                          className={`absolute inset-0 translate-x-1 translate-y-1 rounded-lg border-2 border-black ${job.isDefault ? "bg-black" : "bg-gray-800"}`}
+                        ></div>
+
+                        {/* Tarjeta */}
+                        <div
+                          className={`relative border-2 border-black p-4 rounded-lg flex justify-between items-center ${activeJobProfile?.id === job.id ? "bg-yellow-100 ring-2 ring-yellow-400" : "bg-white"}`}
+                        >
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="font-black text-lg uppercase">{job.companyName}</h3>
+                              {job.isDefault && (
+                                <span className="text-[10px] bg-black text-white px-1 py-0.5 rounded font-bold">
+                                  DEFAULT
+                                </span>
+                              )}
+                              {activeJobProfile?.id === job.id && (
+                                <span className="text-[10px] bg-green-500 text-white px-1 py-0.5 rounded font-bold flex items-center gap-1">
+                                  <Check size={8} /> ACTIVO
+                                </span>
+                              )}
+                            </div>
+                            <div className="text-sm font-bold text-gray-600 flex gap-4">
+                              <span className="flex items-center gap-1">
+                                <Briefcase size={14} /> {job.jobTitle || "Sin cargo"}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <Hash size={14} /> {job.employeeId || "N/A"}
+                              </span>
+                            </div>
+                            <div className="mt-2 text-xs font-mono text-gray-500 hidden sm:block">
+                              Sector: {job.sector}
+                            </div>
+                          </div>
+
+                          <div className="flex flex-col gap-2 pl-4 border-l-2 border-gray-200">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openEditJobForm(job);
+                              }}
+                              className="p-1.5 hover:bg-gray-200 rounded text-blue-600 transition-colors"
+                              title="Editar"
+                            >
+                              <Edit size={18} />
+                            </button>
+
+                            {!job.isDefault && (
+                              <button
+                                onClick={(e) => handleDeleteJob(job.id, e)}
+                                className="p-1.5 hover:bg-red-100 rounded text-red-500 transition-colors"
+                                title="Eliminar"
+                              >
+                                <Trash2 size={18} />
+                              </button>
+                            )}
+
+                            {!job.isDefault && (
+                              <button
+                                onClick={(e) => handleSetDefault(job.id, e)}
+                                className="p-1.5 hover:bg-yellow-100 rounded text-yellow-600 border-2 border-transparent hover:border-yellow-200"
+                                title="Marcar como Principal"
+                              >
+                                <Star size={18} />
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </Main>

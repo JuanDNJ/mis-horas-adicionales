@@ -6,7 +6,7 @@ import { HoursTable } from "@/components/HoursTable";
 import { DashboardToolbar } from "@/components/DashboardToolbar";
 import { FaPlus, FaTimes } from "react-icons/fa";
 import { calculateDuration, cn } from "@/lib/utils";
-import { useUserProfile } from "@/hooks/useUserProfile";
+import { useProfileContext } from "@/hooks/useProfileContext";
 import { auth } from "@/lib/firebase";
 import {
   createHoursRecord,
@@ -17,16 +17,15 @@ import {
 } from "@/lib/hoursService";
 
 const Dashboard = () => {
-  const { userProfile } = useUserProfile();
+  const { activeJobProfile, jobProfiles, updateJobProfile } = useProfileContext();
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Determinar si el perfil está completo
-  const isProfileIncomplete =
-    !userProfile || !userProfile.jobTitle || !userProfile.sector || !userProfile.employeeId;
+  const isProfileIncomplete = !activeJobProfile;
 
   const [horas, setHoras] = useState<HoursRecord[]>([]);
   const [misHoras, setMisHoras] = useState<HoursData>({
@@ -45,6 +44,23 @@ const Dashboard = () => {
     destino: "",
     total_horas: "",
   });
+
+  // Agrupación de horas por Empresa
+  const groupedHours = horas.reduce(
+    (acc, curr) => {
+      // Usar la empresa o "Sin Empresa" como clave
+      const key = curr.empresa?.trim() || "GENERAL";
+      if (!acc[key]) {
+        acc[key] = [];
+      }
+      acc[key].push(curr);
+      return acc;
+    },
+    {} as Record<string, HoursRecord[]>
+  );
+
+  // Ordenar claves para renderizado consistente (puede ser alfabético o fixed)
+  const sortedCompanies = Object.keys(groupedHours).sort();
 
   // Cargar registros desde Firestore al montar el componente
   useEffect(() => {
@@ -99,20 +115,28 @@ const Dashboard = () => {
       setIsSaving(true);
       setError(null);
 
-      if (editingIndex !== null) {
+      if (editingId) {
         // Actualizar registro existente
-        const recordToUpdate = horas[editingIndex];
-        if (recordToUpdate.id) {
-          await updateHoursRecord(recordToUpdate.id, misHoras);
-          const updatedRecords = await getUserHoursRecords(auth.currentUser.uid);
-          setHoras(updatedRecords);
-        }
-        setEditingIndex(null);
+        await updateHoursRecord(editingId, misHoras);
+        const updatedRecords = await getUserHoursRecords(auth.currentUser.uid);
+        setHoras(updatedRecords);
+        setEditingId(null);
       } else {
         // Crear nuevo registro
         await createHoursRecord(auth.currentUser.uid, misHoras);
         const updatedRecords = await getUserHoursRecords(auth.currentUser.uid);
         setHoras(updatedRecords);
+      }
+
+      // Actualizar timestamp del perfil utilizado para que se marque como "Último Activo"
+      const usedProfile = jobProfiles.find(
+        (p) => p.companyName.trim().toLowerCase() === misHoras.empresa.trim().toLowerCase()
+      );
+
+      if (usedProfile) {
+        // Al actualizar el perfil (incluso vacío), se actualiza su 'updatedAt' en el servidor
+        // Esto hará que suba a la primera posición y se seleccione automáticamente
+        await updateJobProfile(usedProfile.id, {});
       }
 
       // Reset form
@@ -142,18 +166,22 @@ const Dashboard = () => {
     }
   };
 
-  const handleEditHour = (index: number) => {
-    setMisHoras(horas[index]);
-    setEditingIndex(index);
+  const handleEditHour = (record: HoursRecord) => {
+    if (!record.id) return;
+    setMisHoras(record); // Carga los datos en el form
+    setEditingId(record.id); // Establece el ID que se está editando
     setIsFormOpen(true);
   };
 
-  const handleDeleteHour = async (index: number) => {
-    const recordToDelete = horas[index];
-
-    if (!recordToDelete.id) {
-      // Si no tiene ID, solo lo removemos localmente (no debería pasar)
-      setHoras(horas.filter((_, i) => i !== index));
+  const handleDeleteHour = async (record: HoursRecord) => {
+    if (!record.id) {
+      // Fallback local: buscamos por 'algún' criterio o no hacemos nada si no tiene ID
+      const index = horas.indexOf(record);
+      if (index > -1) {
+        const newHoras = [...horas];
+        newHoras.splice(index, 1);
+        setHoras(newHoras);
+      }
       return;
     }
 
@@ -163,11 +191,15 @@ const Dashboard = () => {
 
     try {
       setError(null);
-      await deleteHoursRecord(recordToDelete.id);
-      setHoras(horas.filter((_, i) => i !== index));
+      await deleteHoursRecord(record.id);
+      // Recargar de servidor para asegurar consistencia o filtrar local
+      if (auth.currentUser) {
+        const updatedRecords = await getUserHoursRecords(auth.currentUser.uid);
+        setHoras(updatedRecords);
+      }
 
-      if (editingIndex === index) {
-        setEditingIndex(null);
+      if (editingId === record.id) {
+        setEditingId(null);
         setIsFormOpen(false);
       }
     } catch (err) {
@@ -196,12 +228,12 @@ const Dashboard = () => {
         destino: "",
         total_horas: "",
       });
-      setEditingIndex(null);
+      setEditingId(null); // Clear editing state
       setIsFormOpen(true);
     } else {
       // Closing
       setIsFormOpen(false);
-      setEditingIndex(null); // Optional: clear editing state on close
+      setEditingId(null);
     }
   };
 
@@ -214,12 +246,13 @@ const Dashboard = () => {
             isFormOpen={isFormOpen}
             onToggleForm={handleToggleForm}
             isAddDisabled={isProfileIncomplete}
+            activeCompanyName={activeJobProfile?.companyName}
           />
 
           <div className="flex flex-col xl:flex-row items-start justify-center w-full gap-8">
             {/* Form Column - Conditional Rendering with Modal for Mobile */}
             {isFormOpen && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 xl:static xl:z-auto xl:bg-transparent xl:p-0 xl:backdrop-blur-none xl:flex-col xl:w-auto xl:min-w-112.5 animate-in fade-in duration-200 xl:slide-in-from-left">
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 xl:static xl:z-auto xl:bg-transparent xl:p-0 xl:backdrop-blur-none xl:flex-col xl:w-1/3 xl:min-w-87.5 xl:max-w-md animate-in fade-in duration-200 xl:slide-in-from-left transition-all">
                 {/* Scrollable Container for Mobile Modal */}
                 <div className="w-full max-h-[90vh] overflow-y-auto no-scrollbar xl:overflow-visible xl:max-h-none flex flex-col items-center gap-6 xl:gap-0">
                   {/* Close Button for Mobile Modal */}
@@ -251,10 +284,10 @@ const Dashboard = () => {
                     <FaPlus
                       className={cn(
                         "transition-transform duration-300",
-                        editingIndex !== null ? "" : "group-hover:rotate-90"
+                        editingId ? "" : "group-hover:rotate-90"
                       )}
                     />
-                    {isSaving ? "Guardando..." : editingIndex !== null ? "Actualizar" : "Registrar"}
+                    {isSaving ? "Guardando..." : editingId ? "Actualizar" : "Registrar"}
                   </button>
 
                   {/* Spacer for mobile scroll */}
@@ -274,8 +307,51 @@ const Dashboard = () => {
                 <div className="flex items-center justify-center p-8">
                   <div className="text-theme-color font-bold text-xl">Cargando registros...</div>
                 </div>
+              ) : horas.length === 0 ? (
+                <HoursTable
+                  data={[]}
+                  onDelete={handleDeleteHour}
+                  onEdit={handleEditHour}
+                  title="Sin Registros"
+                />
               ) : (
-                <HoursTable data={horas} onDelete={handleDeleteHour} onEdit={handleEditHour} />
+                <div className="space-y-12">
+                  {sortedCompanies.map((company) => {
+                    // Buscar perfil de trabajo coincidente
+                    const companyProfile = jobProfiles.find(
+                      (p) => p.companyName.trim().toLowerCase() === company.trim().toLowerCase()
+                    );
+
+                    // Lógica para mostrar ruta:
+                    // 1. Si existe perfil y es "Transporte" -> MOSTRAR (true)
+                    // 2. Si existe perfil y es "General" -> OCULTAR (false)
+                    // 3. Fallback: Si no hay perfil, verificar si hay datos reales de ruta en los registros
+                    let showRoute = false;
+
+                    if (companyProfile) {
+                      showRoute = companyProfile.sector === "Transporte";
+                    } else {
+                      // Verificar si hay algún dato de ruta en este grupo de registros
+                      const hasRouteData = groupedHours[company].some(
+                        (r) =>
+                          (r.origen && r.origen.trim().length > 0) ||
+                          (r.destino && r.destino.trim().length > 0)
+                      );
+                      showRoute = hasRouteData;
+                    }
+
+                    return (
+                      <HoursTable
+                        key={company}
+                        title={company}
+                        data={groupedHours[company]}
+                        onDelete={handleDeleteHour}
+                        onEdit={handleEditHour}
+                        showRoute={showRoute}
+                      />
+                    );
+                  })}
+                </div>
               )}
             </div>
           </div>

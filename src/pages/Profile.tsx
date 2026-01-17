@@ -1,6 +1,6 @@
 import Header from "@/components/Header";
 import Main from "@/components/Main";
-import { type FC } from "react";
+import { type FC, useEffect, useState } from "react";
 import {
   User,
   Zap,
@@ -13,26 +13,81 @@ import {
   Phone,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useUserProfile } from "@/hooks/useUserProfile";
+import { useUserContext } from "@/hooks/useUserContext";
 import { useProfileContext } from "@/hooks/useProfileContext";
+import { getUserHoursRecords } from "@/lib/hoursService";
+import { auth } from "@/lib/firebase";
+import { HoursChart } from "@/components/HoursChart";
 
 const Profile: FC = () => {
   // Obtenemos datos básicos del contexto global/autenticación
-  const { displayName: authDisplayName, photoURL: authPhotoURL } = useProfileContext();
+  const { displayName: authDisplayName, photoURL: authPhotoURL } = useUserContext();
   // Obtenemos el perfil completo de Firestore
-  const { userProfile, isLoading } = useUserProfile();
+  const { userProfile, activeJobProfile, isLoading } = useProfileContext();
   const navigate = useNavigate();
+
+  const [hoursSummary, setHoursSummary] = useState<{ company: string; total: number }[]>([]);
+  const [grandTotal, setGrandTotal] = useState<number>(0);
+
+  useEffect(() => {
+    const fetchHours = async () => {
+      if (auth.currentUser) {
+        try {
+          const records = await getUserHoursRecords(auth.currentUser.uid);
+
+          // Agrupar horas por empresa
+          const summaryMap: Record<string, number> = {};
+          let total = 0;
+
+          records.forEach((record) => {
+            const h = parseFloat(record.total_horas || "0");
+            const val = isNaN(h) ? 0 : h;
+            // Usar empresa del registro o "Sin Empresa"
+            const company = record.empresa?.trim() || "GENERAL";
+            const companyKey = company.toUpperCase(); // Normalizamos para agrupar
+
+            if (!summaryMap[companyKey]) {
+              summaryMap[companyKey] = 0;
+            }
+            summaryMap[companyKey] += val;
+            total += val;
+          });
+
+          // Convertir a array y ordenar (empresa del perfil activo primero si existe)
+          const summaryArray = Object.keys(summaryMap).map((key) => ({
+            company: key,
+            total: summaryMap[key],
+          }));
+
+          summaryArray.sort((a, b) => {
+            if (activeJobProfile && a.company === activeJobProfile.companyName.toUpperCase())
+              return -1;
+            if (activeJobProfile && b.company === activeJobProfile.companyName.toUpperCase())
+              return 1;
+            return b.total - a.total; // Las de más horas primero por defecto
+          });
+
+          setHoursSummary(summaryArray);
+          setGrandTotal(total);
+        } catch (error) {
+          console.error("Error cargando bolsa de horas:", error);
+        }
+      }
+    };
+
+    // Ejecutar cuando cambie el perfil activo o al montar
+    fetchHours();
+  }, [activeJobProfile]);
 
   // Preferimos los datos del perfil de Firestore, sino los de Auth
   const displayName = userProfile?.displayName || authDisplayName || "USUARIO ANONIMO";
   const photoURL = userProfile?.photoURL || authPhotoURL;
   const phoneNumber = userProfile?.phoneNumber;
-  const employeeId = userProfile?.employeeId;
+  const employeeId = activeJobProfile?.employeeId;
 
   // Si está cargando, podríamos mostrar un spinner, pero por ahora mostramos el layout
   // Calculamos si falta info crítica
-  const hasMissingInfo =
-    !userProfile || !userProfile.jobTitle || !userProfile.sector || !userProfile.employeeId;
+  const hasMissingInfo = !activeJobProfile || !activeJobProfile.jobTitle;
 
   return (
     <>
@@ -98,7 +153,7 @@ const Profile: FC = () => {
                 </div>
                 <div className="text-center sm:text-left w-full overflow-hidden">
                   <div className="flex items-center justify-center sm:justify-start gap-2">
-                    <h1 className="text-2xl sm:text-4xl font-black uppercase italic tracking-tighter mb-2 leading-none break-words">
+                    <h1 className="text-2xl sm:text-4xl font-black uppercase italic tracking-tighter mb-2 leading-none wrap-break-word">
                       {displayName}
                     </h1>
                   </div>
@@ -112,9 +167,9 @@ const Profile: FC = () => {
                   )}
 
                   <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
-                    {userProfile?.jobTitle ? (
+                    {activeJobProfile?.jobTitle ? (
                       <div className="bg-black text-yellow-400 px-3 py-1 text-xs font-bold uppercase skew-x-[-10deg] box-border">
-                        {userProfile.jobTitle}
+                        {activeJobProfile.jobTitle}
                       </div>
                     ) : (
                       <button
@@ -155,12 +210,12 @@ const Profile: FC = () => {
               </div>
               <p
                 className={
-                  userProfile?.sector
+                  activeJobProfile?.sector
                     ? "font-bold text-slate-700"
                     : "font-bold text-amber-600 italic"
                 }
               >
-                {userProfile?.sector || "Pendiente de definir"}
+                {activeJobProfile?.sector || "Pendiente de definir"}
               </p>
             </div>
             <div className="bg-white border-4 border-black p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all cursor-crosshair box-border group">
@@ -177,12 +232,12 @@ const Profile: FC = () => {
               </div>
               <p
                 className={
-                  userProfile?.jobTitle
+                  activeJobProfile?.jobTitle
                     ? "font-bold text-slate-700"
                     : "font-bold text-amber-600 italic"
                 }
               >
-                {userProfile?.jobTitle || "Pendiente de definir"}
+                {activeJobProfile?.jobTitle || "Pendiente de definir"}
               </p>
             </div>
           </div>
@@ -196,13 +251,56 @@ const Profile: FC = () => {
                   {userProfile?.status || "INACTIVO"}
                 </div>
               </div>
-              <div className="flex items-end gap-2 flex-wrap">
-                <span className="text-5xl sm:text-6xl font-black leading-none tracking-tighter shadow-black drop-shadow-sm">
-                  {userProfile?.totalHours || "0"}
-                </span>
-                <span className="text-lg sm:text-xl font-black uppercase underline decoration-white decoration-4 mb-2">
-                  Registradas!
-                </span>
+              <div className="flex flex-col gap-3">
+                {hoursSummary.length === 0 ? (
+                  <div className="flex items-end gap-2 flex-wrap">
+                    <span className="text-5xl sm:text-6xl font-black leading-none tracking-tighter shadow-black drop-shadow-sm">
+                      0
+                    </span>
+                    <span className="text-lg sm:text-xl font-black uppercase underline decoration-white decoration-4 mb-2">
+                      Registradas!
+                    </span>
+                  </div>
+                ) : (
+                  <div className="flex flex-col lg:flex-row gap-6">
+                    {/* Lista de horas textua */}
+                    <div className="flex-1">
+                      <div className=" max-h-40 overflow-y-auto pr-2 custom-scrollbar">
+                        {hoursSummary.map((item) => (
+                          <div
+                            key={item.company}
+                            className="flex justify-between items-center bg-black/10 p-2 rounded mb-2 last:mb-0 border border-black/5"
+                          >
+                            <span className="text-sm sm:text-base font-bold uppercase truncate max-w-[60%] leading-tight text-white drop-shadow-[1px_1px_0_rgba(0,0,0,0.5)]">
+                              {item.company}
+                            </span>
+                            <div className="flex items-baseline gap-1">
+                              <span className="text-2xl sm:text-3xl font-black leading-none text-white drop-shadow-[2px_2px_0_rgba(0,0,0,1)]">
+                                {item.total}
+                              </span>
+                              <span className="text-[10px] font-black uppercase text-white/80">
+                                HRS
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      {hoursSummary.length > 1 && (
+                        <div className="flex justify-between items-center pt-2 border-t-2 border-white/30 mt-1">
+                          <span className="text-xs font-black uppercase">TOTAL ACUMULADO</span>
+                          <span className="text-xl font-black">
+                            {grandTotal} <small className="text-[10px]">HRS</small>
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Grafico de estadisticas */}
+                    <div className="flex-1 min-w-50">
+                      <HoursChart data={hoursSummary} />
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>

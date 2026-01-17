@@ -18,6 +18,11 @@ service cloud.firestore {
       allow update: if isAuthenticated() && isOwner(userId);
       // No permitimos borrar perfiles por ahora (o solo el dueño)
       allow delete: if false; 
+      
+      // Subcolección de empleos (jobs)
+      match /jobs/{jobId} {
+        allow read, write: if isAuthenticated() && isOwner(userId);
+      }
     }
 
     // Reglas para registros de horas

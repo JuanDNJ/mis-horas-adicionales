@@ -1,8 +1,8 @@
-import { useProfileContext } from "@/hooks/useProfileContext";
+import { useUserContext } from "@/hooks/useUserContext";
 import { FcGoogle } from "react-icons/fc";
 
 export const GoogleAcces = () => {
-  const { login } = useProfileContext();
+  const { login } = useUserContext();
   return (
     <button
       onClick={login}

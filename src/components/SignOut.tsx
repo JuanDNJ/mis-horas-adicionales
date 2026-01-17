@@ -1,4 +1,4 @@
-import { useProfileContext } from "@/hooks/useProfileContext";
+import { useUserContext } from "@/hooks/useUserContext";
 import { FaSignOutAlt } from "react-icons/fa";
 import { cn } from "@/lib/utils";
 
@@ -8,7 +8,7 @@ interface SignOutProps {
 }
 
 export const SignOut = ({ className, onAction }: SignOutProps) => {
-  const { logout } = useProfileContext();
+  const { logout } = useUserContext();
 
   const handleClick = () => {
     if (onAction) onAction();

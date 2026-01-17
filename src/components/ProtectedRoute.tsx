@@ -1,8 +1,8 @@
-import { useProfileContext } from "@/hooks/useProfileContext";
+import { useUserContext } from "@/hooks/useUserContext";
 import { Navigate, Outlet } from "react-router-dom";
 
 const ProtectedRoute = () => {
-  const { isAuthenticated, isLoading } = useProfileContext();
+  const { isAuthenticated, isLoading } = useUserContext();
 
   if (isLoading) {
     return (

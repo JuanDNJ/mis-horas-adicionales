@@ -9,6 +9,7 @@ import {
   where,
   orderBy,
   Timestamp,
+  writeBatch,
   type DocumentData,
 } from "firebase/firestore";
 import { firestore } from "./firebase";
@@ -176,5 +177,50 @@ export const getUserHoursRecordsByDateRange = async (
   } catch (error) {
     console.error("Error al obtener registros de horas por rango de fecha:", error);
     throw new Error("No se pudieron cargar los registros de horas");
+  }
+};
+
+/**
+ * Actualiza el nombre de la empresa en todos los registros de horas de un usuario
+ * Útil cuando se edita el nombre de un perfil de trabajo y se quiere mantener sincronizado
+ */
+export const updateCompanyNameInRecords = async (
+  userId: string,
+  oldCompanyName: string,
+  newCompanyName: string
+): Promise<void> => {
+  try {
+    // 1. Buscamos todos los registros que tengan el nombre antiguo
+    const q = query(
+      collection(firestore, COLLECTION_NAME),
+      where("userId", "==", userId),
+      where("empresa", "==", oldCompanyName)
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      return;
+    }
+
+    // 2. Usamos Batch para actualizar múltiples documentos atómicamente
+    // Nota: Firestore limita los batch a 500 operaciones. Si hay más, habría que dividirlo.
+    const batch = writeBatch(firestore);
+
+    querySnapshot.docs.forEach((doc) => {
+      batch.update(doc.ref, {
+        empresa: newCompanyName,
+        updatedAt: Timestamp.fromDate(new Date()),
+      });
+    });
+
+    await batch.commit();
+    console.log(
+      `Actualizados ${querySnapshot.size} registros de ${oldCompanyName} a ${newCompanyName}`
+    );
+  } catch (error) {
+    console.error("Error al migrar nombre de empresa en registros:", error);
+    // No lanzamos error para no romper el flujo principal si esto falla,
+    // pero idealmente deberíamos notificarlo.
   }
 };
