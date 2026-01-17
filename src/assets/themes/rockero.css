@@ -18,6 +18,6 @@
   --action-update: #9333ea;
   --font-theme: "Permanent Marker", cursive;
   background-color: var(--theme-bg);
-  background-image: url("/themes/rockero/backgrounds/bg_rockero_v2.png");
+  background-image: url("/themes/rockero/backgrounds/bg_rockero.png");
   color: var(--theme-color);
 }

@@ -18,6 +18,6 @@
   --action-update: #10b981;
   --font-theme: "Comic Neue", cursive;
   background-color: var(--theme-bg);
-  background-image: url("/themes/comic/backgrounds/bg_comic_v2.png");
+  background-image: url("/themes/comic/backgrounds/bg_comic.png");
   color: var(--theme-color);
 }

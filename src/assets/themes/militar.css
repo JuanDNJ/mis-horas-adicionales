@@ -18,5 +18,6 @@
   --action-update: #4d7c0f;
   --font-theme: "Black Ops One", system-ui;
   background-color: var(--theme-bg);
+  background-image: url("/themes/militar/backgrounds/bg_militar.png");
   color: var(--theme-color);
 }

@@ -18,5 +18,6 @@
   --action-update: #15803d;
   --font-theme: "Irish Grover", cursive;
   background-color: var(--theme-bg);
+  background-image: url("/themes/duende/backgrounds/bg_duende.png");
   color: var(--theme-color);
 }

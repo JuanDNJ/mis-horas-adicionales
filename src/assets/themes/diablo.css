@@ -18,6 +18,6 @@
   --action-update: #c2410c;
   --font-theme: "Creepster", cursive;
   background-color: var(--theme-bg);
-  background-image: url("/themes/diablo/backgrounds/bg_diablo_v2.png");
+  background-image: url("/themes/diablo/backgrounds/bg_diablo.png");
   color: var(--theme-color);
 }
