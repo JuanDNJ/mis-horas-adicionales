@@ -18,5 +18,6 @@
   --action-update: #6366f1;
   --font-theme: "Orbitron", sans-serif;
   background-color: var(--theme-bg);
+  background-image: url("/themes/espacio/backgrounds/bg_espacio.png");
   color: var(--theme-color);
 }

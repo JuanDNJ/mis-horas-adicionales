@@ -18,5 +18,6 @@
   --action-update: #22c55e;
   --font-theme: "Bangers", system-ui;
   background-color: var(--theme-bg);
+  background-image: url("/themes/heroe/backgrounds/bg_heroe.png");
   color: var(--theme-color);
 }

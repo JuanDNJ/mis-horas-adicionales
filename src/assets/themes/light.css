@@ -16,5 +16,6 @@
   --action-delete: #dc2626;
   --action-update: #16a34a;
   background-color: var(--theme-bg);
+  background-image: url("/themes/light/backgrounds/bg_light.png");
   color: var(--theme-color);
 }

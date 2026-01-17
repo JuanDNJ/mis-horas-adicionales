@@ -17,6 +17,7 @@
   --action-delete: #ef4444;
   --action-update: #22c55e;
   background-color: var(--theme-bg);
+  background-image: url("/themes/default/backgrounds/bg_default.png");
   box-shadow: 8px 8px 0px #121212;
   /* Sombra dura estilo cómic */
 }
