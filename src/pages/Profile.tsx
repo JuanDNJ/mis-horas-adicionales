@@ -97,7 +97,7 @@ const Profile: FC = () => {
                 </div>
                 <div className="text-center sm:text-left w-full overflow-hidden">
                   <div className="flex items-center justify-center sm:justify-start gap-2">
-                    <h1 className="text-2xl sm:text-4xl font-black uppercase italic tracking-tighter mb-2 leading-none break-words">
+                    <h1 className="text-2xl sm:text-4xl font-black uppercase italic tracking-tighter mb-2 leading-none wrap-break-word">
                       {displayName}
                     </h1>
                   </div>

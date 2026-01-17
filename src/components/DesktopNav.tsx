@@ -1,9 +1,9 @@
 import { NavLink } from "react-router-dom";
 import type { FC } from "react";
-import { useProfileContext } from "@/hooks/useProfileContext";
+import { useUserContext } from "@/hooks/useUserContext";
 
 export const DesktopNav: FC = () => {
-  const { isAuthenticated } = useProfileContext();
+  const { isAuthenticated } = useUserContext();
 
   return (
     <nav className="hidden xl:flex justify-center gap-8 items-center absolute left-1/2 -translate-x-1/2">

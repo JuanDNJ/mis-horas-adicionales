@@ -213,6 +213,7 @@ const Dashboard = () => {
             isFormOpen={isFormOpen}
             onToggleForm={handleToggleForm}
             isAddDisabled={isProfileIncomplete}
+            activeCompanyName={activeJobProfile?.companyName}
           />
 
           <div className="flex flex-col xl:flex-row items-start justify-center w-full gap-8">

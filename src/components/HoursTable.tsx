@@ -1,13 +1,16 @@
-import { FaTrash, FaPen } from "react-icons/fa";
-import { type HoursData } from "./HoursForm";
+import { useNavigate } from "react-router-dom";
+import { FaTrash, FaPen, FaEye } from "react-icons/fa";
+import { type HoursRecord } from "@/lib/hoursService";
 
 interface HoursTableProps {
-  data: HoursData[];
+  data: HoursRecord[];
   onDelete: (index: number) => void;
   onEdit: (index: number) => void;
 }
 
 export const HoursTable = ({ data, onDelete, onEdit }: HoursTableProps) => {
+  const navigate = useNavigate();
+
   if (data.length === 0) {
     return (
       <div className="w-full text-center p-8 border-4 border-black border-dashed bg-white/30 rounded-sm">
@@ -28,6 +31,7 @@ export const HoursTable = ({ data, onDelete, onEdit }: HoursTableProps) => {
           <thead>
             <tr className="bg-theme-header-bg border-b-4 border-black text-theme-color uppercase tracking-wider text-sm">
               <th className="p-4 border-r-2 border-black font-black">Fecha</th>
+              <th className="p-4 border-r-2 border-black font-black">Empresa</th>
               <th className="p-4 border-r-2 border-black font-black hidden lg:table-cell">
                 Horario
               </th>
@@ -47,6 +51,9 @@ export const HoursTable = ({ data, onDelete, onEdit }: HoursTableProps) => {
               >
                 <td className="p-4 border-r-2 border-black">
                   {item.dia}/{item.mes}/{item.anio}
+                </td>
+                <td className="p-4 border-r-2 border-black text-sm uppercase">
+                  {item.empresa || "Sin empresa"}
                 </td>
                 <td className="p-4 border-r-2 border-black whitespace-nowrap hidden lg:table-cell">
                   {item.hora_entrada} - {item.hora_salida}
@@ -72,9 +79,18 @@ export const HoursTable = ({ data, onDelete, onEdit }: HoursTableProps) => {
                 </td>
                 <td className="p-4 text-center">
                   <div className="flex items-center justify-center gap-2">
+                    {item.id && (
+                      <button
+                        onClick={() => navigate(`/record/${item.id}`)}
+                        className="p-2 bg-action-create hover:brightness-110 border-2 border-black text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-0.5 active:translate-y-0.5 transition-all"
+                        title="Ver detalle"
+                      >
+                        <FaEye size={18} />
+                      </button>
+                    )}
                     <button
                       onClick={() => onEdit(index)}
-                      className="p-2 bg-theme-accent hover:brightness-110 border-2 border-black text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-0.5 active:translate-y-0.5 transition-all"
+                      className="p-2 bg-action-edit hover:brightness-110 border-2 border-black text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-0.5 active:translate-y-0.5 transition-all"
                       title="Editar registro"
                     >
                       <FaPen size={18} />
@@ -102,9 +118,17 @@ export const HoursTable = ({ data, onDelete, onEdit }: HoursTableProps) => {
             className="border-4 border-black bg-theme-bg p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] relative flex flex-col gap-2"
           >
             <div className="absolute top-2 right-2 flex gap-2">
+              {item.id && (
+                <button
+                  onClick={() => navigate(`/record/${item.id}`)}
+                  className="p-2 bg-action-create hover:brightness-110 border-2 border-black text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
+                >
+                  <FaEye size={14} />
+                </button>
+              )}
               <button
                 onClick={() => onEdit(index)}
-                className="p-2 bg-theme-accent hover:brightness-110 border-2 border-black text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
+                className="p-2 bg-action-edit hover:brightness-110 border-2 border-black text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
               >
                 <FaPen size={14} />
               </button>
@@ -116,9 +140,12 @@ export const HoursTable = ({ data, onDelete, onEdit }: HoursTableProps) => {
               </button>
             </div>
 
-            <div className="border-b-2 border-black pb-2 mb-2">
+            <div className="border-b-2 border-black pb-2 mb-2 flex justify-between items-center">
               <span className="bg-theme-header-bg px-2 py-1 border-2 border-black text-xs font-bold uppercase tracking-widest">
                 {item.dia}/{item.mes}/{item.anio}
+              </span>
+              <span className="text-[10px] font-black uppercase text-secondary bg-white/50 px-2 py-0.5 rounded border border-black/10 truncate max-w-30">
+                {item.empresa}
               </span>
             </div>
 

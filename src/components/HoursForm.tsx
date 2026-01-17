@@ -13,7 +13,7 @@ import { Popover } from "@/components/Popover";
 import { FaCalendarAlt } from "react-icons/fa";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { useUserProfile } from "@/hooks/useUserProfile";
+import { useProfileContext } from "@/hooks/useProfileContext";
 
 export interface HoursData {
   empresa: string;
@@ -114,14 +114,28 @@ const SectorNavigation = ({
 );
 
 export const HoursForm = ({ formData, onChange, setFormData }: HoursFormProps) => {
-  const { userProfile, activeJobProfile } = useUserProfile();
+  const { userProfile, activeJobProfile, jobProfiles } = useProfileContext();
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
-  // Calculate sector based on formData and active Job Profile
+  // Track the job associated with the current form data
+  const [selectedJobId, setSelectedJobId] = useState<string | undefined>(activeJobProfile?.id);
+
+  // Update selected job when active profile changes externally, but only if we are starting fresh
+  // or if we want to force sync. Ideally, we just init with it.
+  useEffect(() => {
+    if (activeJobProfile && !formData.empresa) {
+      setSelectedJobId(activeJobProfile.id);
+    }
+  }, [activeJobProfile, formData.empresa]);
+
+  // Find the full job object
+  const currentFormJob = jobProfiles.find((j) => j.id === selectedJobId) || activeJobProfile;
+
+  // Calculate sector based on formData and current form Job
   const hasTransportData = formData.origen || formData.destino;
   const calculatedSector: "general" | "transport" = hasTransportData
     ? "transport"
-    : activeJobProfile?.sector === "Transporte"
+    : currentFormJob?.sector === "Transporte"
       ? "transport"
       : "general";
 
@@ -131,6 +145,21 @@ export const HoursForm = ({ formData, onChange, setFormData }: HoursFormProps) =
   useEffect(() => {
     setSector(calculatedSector);
   }, [calculatedSector]);
+
+  // Handle Job Selection from dropdown
+  const handleJobSelect = (e: ChangeEvent<HTMLSelectElement>) => {
+    const newJobId = e.target.value;
+    setSelectedJobId(newJobId);
+
+    const job = jobProfiles.find((j) => j.id === newJobId);
+    if (job && setFormData) {
+      setFormData((prev) => ({
+        ...prev,
+        empresa: job.companyName,
+        numero_empleado: job.employeeId,
+      }));
+    }
+  };
 
   // Autocomplete form data from user profile AND active job profile on mount
   useEffect(() => {
@@ -166,8 +195,8 @@ export const HoursForm = ({ formData, onChange, setFormData }: HoursFormProps) =
 
         return {
           ...prev,
-          numero_empleado: activeJobProfile?.employeeId || prev.numero_empleado || "",
-          empresa: activeJobProfile?.companyName || prev.empresa || "",
+          numero_empleado: currentFormJob?.employeeId || prev.numero_empleado || "",
+          empresa: currentFormJob?.companyName || prev.empresa || "",
           telefono: userProfile.phoneNumber || prev.telefono || "",
           nombre: nombre,
           apellido_paterno: apellido_paterno,
@@ -175,7 +204,7 @@ export const HoursForm = ({ formData, onChange, setFormData }: HoursFormProps) =
         };
       });
     }
-  }, [userProfile, activeJobProfile, setFormData]);
+  }, [userProfile, currentFormJob, setFormData]);
 
   // Helper to handle date selection from Calendar
   const handleDateSelect = (date: Date | undefined) => {
@@ -223,14 +252,44 @@ export const HoursForm = ({ formData, onChange, setFormData }: HoursFormProps) =
       <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
         {/* Datos Personales */}
         <InputGroup label="Información Personal">
-          <Input
-            label="Empresa"
-            name="empresa"
-            value={formData.empresa}
-            onChange={onChange}
-            placeholder="Nombre de la empresa"
-            containerClassName="col-span-1 md:col-span-2 lg:col-span-3"
-          />
+          {jobProfiles.length > 0 ? (
+            <div className="col-span-1 md:col-span-2 lg:col-span-3 flex flex-col gap-1">
+              <label className="text-xs font-bold text-secondary uppercase tracking-wider ml-1">
+                Empresa / Perfil
+              </label>
+              <div className="relative">
+                <select
+                  value={selectedJobId || ""}
+                  onChange={handleJobSelect}
+                  className="w-full px-3 py-2 bg-theme-bg border-2 border-black text-theme-color focus:outline-none focus:shadow-[4px_4px_0px_0px_var(--theme-accent)] focus:border-theme-accent transition-all duration-200 font-bold appearance-none cursor-pointer"
+                >
+                  <option value="" disabled>
+                    Selecciona una empresa
+                  </option>
+                  {jobProfiles.map((job) => (
+                    <option key={job.id} value={job.id}>
+                      {job.companyName} {job.isDefault ? "(Principal)" : ""}
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none opacity-50">
+                  ▼
+                </div>
+              </div>
+              {/* Hidden input to maintain compatibility if 'empresa' is manually typed in logic elsewhere, though we sync it */}
+              <input type="hidden" name="empresa" value={formData.empresa} />
+            </div>
+          ) : (
+            <Input
+              label="Empresa"
+              name="empresa"
+              value={formData.empresa}
+              onChange={onChange}
+              placeholder="Nombre de la empresa"
+              containerClassName="col-span-1 md:col-span-2 lg:col-span-3"
+            />
+          )}
+
           <Input
             label="No. Empleado"
             name="numero_empleado"

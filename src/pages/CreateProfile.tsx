@@ -1,19 +1,7 @@
 import Header from "@/components/Header";
 import Main from "@/components/Main";
 import { type FC, useState, useEffect, useRef } from "react";
-import {
-  Save,
-  User,
-  Building2,
-  Briefcase,
-  Hash,
-  Phone,
-  Camera,
-  Plus,
-  Trash2,
-  Edit,
-  Check,
-} from "lucide-react";
+import { Save, User, Briefcase, Hash, Camera, Plus, Trash2, Edit, Check } from "lucide-react";
 import { useProfileContext } from "@/hooks/useProfileContext";
 import { storage, auth } from "@/lib/firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
@@ -85,7 +73,6 @@ const CreateProfile: FC = () => {
     updateJobProfile,
     deleteJobProfile,
     setActiveJobProfile,
-    isLoading,
   } = useProfileContext();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -248,8 +235,10 @@ const CreateProfile: FC = () => {
     if (confirm("¿Seguro que quieres eliminar este perfil de trabajo?")) {
       try {
         await deleteJobProfile(id);
-      } catch (error: any) {
-        alert(error.message);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          alert(error.message);
+        }
       }
     }
   };
@@ -424,7 +413,10 @@ const CreateProfile: FC = () => {
                         <select
                           value={jobData.sector}
                           onChange={(e) =>
-                            setJobData({ ...jobData, sector: e.target.value as any })
+                            setJobData({
+                              ...jobData,
+                              sector: e.target.value as "General" | "Transporte",
+                            })
                           }
                           className="w-full border-2 border-black p-2 font-bold cursor-pointer"
                         >

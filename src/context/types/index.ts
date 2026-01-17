@@ -55,7 +55,9 @@ export interface ProfileContextType {
   updateUserProfile: (data: Partial<UserProfile>) => Promise<void>;
 
   // CRUD de Perfiles Laborales
-  addJobProfile: (data: Omit<JobProfile, "id" | "createdAt" | "updatedAt" | "isDefault">) => Promise<void>;
+  addJobProfile: (
+    data: Omit<JobProfile, "id" | "createdAt" | "updatedAt" | "isDefault">
+  ) => Promise<void>;
   updateJobProfile: (id: string, data: Partial<JobProfile>) => Promise<void>;
   deleteJobProfile: (id: string) => Promise<void>;
   setActiveJobProfile: (id: string) => void;

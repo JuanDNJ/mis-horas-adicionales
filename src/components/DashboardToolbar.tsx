@@ -5,12 +5,14 @@ interface DashboardToolbarProps {
   isFormOpen: boolean;
   onToggleForm: () => void;
   isAddDisabled?: boolean;
+  activeCompanyName?: string;
 }
 
 export const DashboardToolbar = ({
   isFormOpen,
   onToggleForm,
   isAddDisabled = false,
+  activeCompanyName,
 }: DashboardToolbarProps) => {
   return (
     <div className="w-full flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 p-4 border-4 border-black bg-theme-bg shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] mb-8">
@@ -49,6 +51,15 @@ export const DashboardToolbar = ({
 
       {/* Right Actions: Filters Placeholders */}
       <div className="flex items-center gap-2">
+        {activeCompanyName && (
+          <div className="flex flex-col items-end md:hidden bg-white/50 px-2 py-1 border border-black/20 rounded">
+            <span className="text-[10px] uppercase font-bold text-secondary">Empresa:</span>
+            <span className="text-xs font-black uppercase text-theme-color">
+              {activeCompanyName}
+            </span>
+          </div>
+        )}
+
         {/* Placeholder for future filters */}
         <div className="items-center gap-2 px-4 py-2 border-2 border-black bg-white/50 opacity-60 cursor-not-allowed hidden md:flex">
           <FaFilter className="text-secondary" />

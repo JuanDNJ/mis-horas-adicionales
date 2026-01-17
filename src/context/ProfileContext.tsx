@@ -91,8 +91,14 @@ export const ProfileProvider: React.FC<{ children: ReactNode }> = ({ children })
       // --- Lógica de Migración (Solo si hay userProfile antiguo pero no jobs) ---
       // Si el usuario tenía datos en el modelo plano antiguo, los movemos a un primer JobProfile
       if (userData && jobs.length === 0) {
-        // Chequeamos si el userData tiene campos legados (esto depende de si TS nos deja acceder, usamos 'any' temporalmente)
-        const legacyData = userData as any;
+        // Chequeamos si el userData tiene campos legados
+        const legacyData = userData as unknown as {
+          companyName?: string;
+          empresa?: string;
+          jobTitle?: string;
+          employeeId?: string;
+          sector?: string;
+        };
         if (
           legacyData.companyName ||
           legacyData.empresa ||
