@@ -2,7 +2,7 @@ import type { FC } from "react";
 import { FaTimes } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { useProfileContext } from "@/hooks/useProfileContext";
+import { useUserContext } from "@/hooks/useUserContext";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -10,7 +10,7 @@ interface MobileMenuProps {
 }
 
 export const MobileMenu: FC<MobileMenuProps> = ({ isOpen, onClose }) => {
-  const { isAuthenticated } = useProfileContext();
+  const { isAuthenticated } = useUserContext();
   return (
     <>
       {/* Overlay */}

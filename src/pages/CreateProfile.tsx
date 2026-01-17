@@ -1,7 +1,6 @@
 import Header from "@/components/Header";
 import Main from "@/components/Main";
-import { type FC, useState, useEffect, useMemo, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { type FC, useState, useEffect, useRef } from "react";
 import {
   Save,
   User,
@@ -16,10 +15,9 @@ import {
   Check,
 } from "lucide-react";
 import { useProfileContext } from "@/hooks/useProfileContext";
-import { useUserProfile } from "@/hooks/useUserProfile"; // Nota: este hook exporta el contexto, verificar si hay redundancia
 import { storage, auth } from "@/lib/firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { JobProfile } from "@/context/types";
+import type { JobProfile } from "@/context/types/index";
 
 // Función para comprimir y redimensionar imagen (Mantenida igual)
 const compressImage = (file: File): Promise<File> => {
@@ -90,7 +88,6 @@ const CreateProfile: FC = () => {
     isLoading,
   } = useProfileContext();
 
-  const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // --- States ---

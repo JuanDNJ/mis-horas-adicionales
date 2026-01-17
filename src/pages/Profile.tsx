@@ -13,26 +13,25 @@ import {
   Phone,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useUserProfile } from "@/hooks/useUserProfile";
+import { useUserContext } from "@/hooks/useUserContext";
 import { useProfileContext } from "@/hooks/useProfileContext";
 
 const Profile: FC = () => {
   // Obtenemos datos básicos del contexto global/autenticación
-  const { displayName: authDisplayName, photoURL: authPhotoURL } = useProfileContext();
+  const { displayName: authDisplayName, photoURL: authPhotoURL } = useUserContext();
   // Obtenemos el perfil completo de Firestore
-  const { userProfile, isLoading } = useUserProfile();
+  const { userProfile, activeJobProfile, isLoading } = useProfileContext();
   const navigate = useNavigate();
 
   // Preferimos los datos del perfil de Firestore, sino los de Auth
   const displayName = userProfile?.displayName || authDisplayName || "USUARIO ANONIMO";
   const photoURL = userProfile?.photoURL || authPhotoURL;
   const phoneNumber = userProfile?.phoneNumber;
-  const employeeId = userProfile?.employeeId;
+  const employeeId = activeJobProfile?.employeeId;
 
   // Si está cargando, podríamos mostrar un spinner, pero por ahora mostramos el layout
   // Calculamos si falta info crítica
-  const hasMissingInfo =
-    !userProfile || !userProfile.jobTitle || !userProfile.sector || !userProfile.employeeId;
+  const hasMissingInfo = !activeJobProfile || !activeJobProfile.jobTitle;
 
   return (
     <>
@@ -112,9 +111,9 @@ const Profile: FC = () => {
                   )}
 
                   <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
-                    {userProfile?.jobTitle ? (
+                    {activeJobProfile?.jobTitle ? (
                       <div className="bg-black text-yellow-400 px-3 py-1 text-xs font-bold uppercase skew-x-[-10deg] box-border">
-                        {userProfile.jobTitle}
+                        {activeJobProfile.jobTitle}
                       </div>
                     ) : (
                       <button
@@ -155,12 +154,12 @@ const Profile: FC = () => {
               </div>
               <p
                 className={
-                  userProfile?.sector
+                  activeJobProfile?.sector
                     ? "font-bold text-slate-700"
                     : "font-bold text-amber-600 italic"
                 }
               >
-                {userProfile?.sector || "Pendiente de definir"}
+                {activeJobProfile?.sector || "Pendiente de definir"}
               </p>
             </div>
             <div className="bg-white border-4 border-black p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all cursor-crosshair box-border group">
@@ -177,12 +176,12 @@ const Profile: FC = () => {
               </div>
               <p
                 className={
-                  userProfile?.jobTitle
+                  activeJobProfile?.jobTitle
                     ? "font-bold text-slate-700"
                     : "font-bold text-amber-600 italic"
                 }
               >
-                {userProfile?.jobTitle || "Pendiente de definir"}
+                {activeJobProfile?.jobTitle || "Pendiente de definir"}
               </p>
             </div>
           </div>
@@ -198,7 +197,7 @@ const Profile: FC = () => {
               </div>
               <div className="flex items-end gap-2 flex-wrap">
                 <span className="text-5xl sm:text-6xl font-black leading-none tracking-tighter shadow-black drop-shadow-sm">
-                  {userProfile?.totalHours || "0"}
+                  0
                 </span>
                 <span className="text-lg sm:text-xl font-black uppercase underline decoration-white decoration-4 mb-2">
                   Registradas!

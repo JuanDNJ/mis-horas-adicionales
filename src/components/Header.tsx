@@ -5,15 +5,15 @@ import { HeaderControls } from "./HeaderControls";
 import { HeaderLogo } from "./HeaderLogo";
 import { GoogleAcces } from "./GoogleAcces";
 import { useProfileContext } from "@/hooks/useProfileContext";
-import { useUserProfile } from "@/hooks/useUserProfile";
+import { useUserContext } from "@/hooks/useUserContext";
 import { cn } from "@/lib/utils";
 import { Briefcase } from "lucide-react";
 
 const Header: FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const { isAuthenticated } = useProfileContext();
-  const { activeJobProfile } = useUserProfile();
+  const { isAuthenticated } = useUserContext();
+  const { activeJobProfile } = useProfileContext();
 
   useEffect(() => {
     const handleScroll = () => {

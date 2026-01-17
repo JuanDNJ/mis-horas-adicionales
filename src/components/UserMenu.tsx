@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, type FC } from "react";
 import { FaUserCircle, FaUser } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { useProfileContext } from "@/hooks/useProfileContext";
+import { useUserContext } from "@/hooks/useUserContext";
 import { SignOut } from "./SignOut";
 
 interface UserMenuProps {
@@ -10,7 +10,7 @@ interface UserMenuProps {
 }
 
 export const UserMenu: FC<UserMenuProps> = ({ className }) => {
-  const { isAuthenticated, photoURL, displayName, email } = useProfileContext();
+  const { isAuthenticated, photoURL, displayName, email } = useUserContext();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 

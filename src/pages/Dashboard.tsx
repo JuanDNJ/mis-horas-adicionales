@@ -6,7 +6,7 @@ import { HoursTable } from "@/components/HoursTable";
 import { DashboardToolbar } from "@/components/DashboardToolbar";
 import { FaPlus, FaTimes } from "react-icons/fa";
 import { calculateDuration, cn } from "@/lib/utils";
-import { useUserProfile } from "@/hooks/useUserProfile";
+import { useProfileContext } from "@/hooks/useProfileContext";
 import { auth } from "@/lib/firebase";
 import {
   createHoursRecord,
@@ -17,7 +17,7 @@ import {
 } from "@/lib/hoursService";
 
 const Dashboard = () => {
-  const { userProfile } = useUserProfile();
+  const { activeJobProfile } = useProfileContext();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -25,8 +25,7 @@ const Dashboard = () => {
   const [error, setError] = useState<string | null>(null);
 
   // Determinar si el perfil está completo
-  const isProfileIncomplete =
-    !userProfile || !userProfile.jobTitle || !userProfile.sector || !userProfile.employeeId;
+  const isProfileIncomplete = !activeJobProfile;
 
   const [horas, setHoras] = useState<HoursRecord[]>([]);
   const [misHoras, setMisHoras] = useState<HoursData>({
