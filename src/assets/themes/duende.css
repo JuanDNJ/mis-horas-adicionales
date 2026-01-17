@@ -16,6 +16,7 @@
   --action-edit: #eab308;
   --action-delete: #be123c;
   --action-update: #15803d;
+  --font-theme: "Irish Grover", cursive;
   background-color: var(--theme-bg);
   color: var(--theme-color);
 }

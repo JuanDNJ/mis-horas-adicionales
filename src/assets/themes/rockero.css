@@ -16,6 +16,7 @@
   --action-edit: #fbbf24;
   --action-delete: #e11d48;
   --action-update: #9333ea;
+  --font-theme: "Permanent Marker", cursive;
   background-color: var(--theme-bg);
   background-image: url("/themes/rockero/backgrounds/bg_rockero_v2.png");
   color: var(--theme-color);

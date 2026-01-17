@@ -3,7 +3,7 @@
 html,
 body {
   font-size: 116.36%;
-  font-family: fantasy, Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+  font-family: var(--font-theme, "Bricolage Grotesque", sans-serif);
   line-height: 1.5;
   font-weight: 400;
   font-synthesis: none;

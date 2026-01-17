@@ -16,6 +16,7 @@
   --action-edit: #d97706;
   --action-delete: #7f1d1d;
   --action-update: #c2410c;
+  --font-theme: "Creepster", cursive;
   background-color: var(--theme-bg);
   background-image: url("/themes/diablo/backgrounds/bg_diablo_v2.png");
   color: var(--theme-color);

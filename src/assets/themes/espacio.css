@@ -16,6 +16,7 @@
   --action-edit: #d946ef;
   --action-delete: #ec4899;
   --action-update: #6366f1;
+  --font-theme: "Orbitron", sans-serif;
   background-color: var(--theme-bg);
   color: var(--theme-color);
 }
