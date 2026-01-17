@@ -29,7 +29,6 @@ export interface HoursData {
   hora_salida: string;
   origen: string;
   destino: string;
-  ramo?: string;
   total_horas: string;
 }
 
@@ -119,7 +118,7 @@ export const HoursForm = ({ formData, onChange, setFormData }: HoursFormProps) =
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   // Calculate sector based on formData and userProfile
-  const hasTransportData = formData.ramo || formData.origen || formData.destino;
+  const hasTransportData = formData.origen || formData.destino;
   const calculatedSector: "general" | "transport" = hasTransportData
     ? "transport"
     : userProfile?.sector === "Transporte"
@@ -293,19 +292,10 @@ export const HoursForm = ({ formData, onChange, setFormData }: HoursFormProps) =
           {sector === "transport" && (
             <>
               <Input
-                label="Ramo"
-                name="ramo"
-                value={formData.ramo || ""}
-                onChange={onChange}
-                placeholder="Ej: Transporte de mercancías"
-                containerClassName="col-span-1 md:col-span-1 lg:col-span-3"
-              />
-              <Input
                 label="Origen"
                 name="origen"
                 value={formData.origen}
                 onChange={onChange}
-                placeholder="Lugar de origen"
                 containerClassName="col-span-1 md:col-span-1 lg:col-span-1"
               />
               <Input
@@ -313,7 +303,6 @@ export const HoursForm = ({ formData, onChange, setFormData }: HoursFormProps) =
                 name="destino"
                 value={formData.destino}
                 onChange={onChange}
-                placeholder="Lugar de destino"
                 containerClassName="col-span-1 md:col-span-1 lg:col-span-2"
               />
             </>
