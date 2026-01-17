@@ -28,6 +28,6 @@ const firebaseApp = initializeApp(firebaseConfig);
 const analytics = getAnalytics(firebaseApp);
 const firestore = getFirestore(firebaseApp);
 const storage = getStorage(firebaseApp);
-const auth = getAuth();
+const auth = getAuth(firebaseApp);
 export { firebaseApp, analytics, firestore, storage, auth };
 export { GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut };

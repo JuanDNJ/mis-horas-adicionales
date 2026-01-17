@@ -1,11 +1,13 @@
 # Implementación de Firestore para Registros de Horas
 
 ## 📋 Resumen
+
 Se ha implementado la funcionalidad de guardar registros de horas en Firestore, reemplazando el almacenamiento local (localStorage) por una base de datos en la nube.
 
 ## 🎯 Características Implementadas
 
 ### 1. Servicio de Horas (`hoursService.ts`)
+
 Nuevo servicio que maneja todas las operaciones CRUD con Firestore:
 
 - **`createHoursRecord(userId, data)`**: Crea un nuevo registro de horas
@@ -15,6 +17,7 @@ Nuevo servicio que maneja todas las operaciones CRUD con Firestore:
 - **`getUserHoursRecordsByDateRange(userId, startDate, endDate)`**: Obtiene registros filtrados por fecha
 
 ### 2. Actualización del Dashboard
+
 El componente `Dashboard.tsx` ahora:
 
 - ✅ Carga registros desde Firestore al montar el componente
@@ -26,6 +29,7 @@ El componente `Dashboard.tsx` ahora:
 - ✅ Deshabilita el botón de guardar mientras se está guardando
 
 ### 3. Reglas de Firestore
+
 Se actualizaron las reglas de seguridad para:
 
 ```javascript
@@ -37,11 +41,13 @@ match /hours_records/{recordId} {
 ```
 
 **Seguridad implementada:**
+
 - ✅ Solo usuarios autenticados pueden acceder
 - ✅ Los usuarios solo pueden ver sus propios registros
 - ✅ Los usuarios solo pueden modificar/eliminar sus propios registros
 
 ### 4. Índices de Firestore
+
 Se crearon índices compuestos para optimizar las consultas:
 
 ```json
@@ -57,12 +63,14 @@ Se crearon índices compuestos para optimizar las consultas:
 ## 🔄 Migración de Datos
 
 ### Datos Existentes en localStorage
+
 Los datos guardados anteriormente en localStorage **NO se migran automáticamente**. Para migrar datos existentes:
 
 1. Los usuarios deben volver a registrar sus horas
 2. O se puede crear un script de migración (opcional para futuro)
 
 ### Estructura de Datos
+
 Cada registro en Firestore incluye:
 
 ```typescript
@@ -91,11 +99,13 @@ Cada registro en Firestore incluye:
 ## 🚀 Despliegue
 
 ### Reglas de Firestore
+
 ```bash
 firebase deploy --only firestore:rules
 ```
 
 ### Índices de Firestore
+
 ```bash
 firebase deploy --only firestore:indexes
 ```
@@ -120,6 +130,7 @@ firebase deploy --only firestore:indexes
 - [ ] Cálculo automático de totales por período
 
 ## 🔧 Dependencias
+
 - `firebase/firestore`: Para operaciones de base de datos
 - Las reglas de Firestore están desplegadas
 - Los índices están creados en Firebase
