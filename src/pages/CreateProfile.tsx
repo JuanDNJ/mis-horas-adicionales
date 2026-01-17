@@ -1,15 +1,88 @@
 import Header from "@/components/Header";
 import Main from "@/components/Main";
-import { type FC, useState, useEffect, useMemo } from "react";
+import { type FC, useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Save, User, Building2, Briefcase, Hash, Phone } from "lucide-react";
+import { Save, User, Building2, Briefcase, Hash, Phone, Camera } from "lucide-react";
 import { useProfileContext } from "@/hooks/useProfileContext";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import { storage, auth } from "@/lib/firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+
+// Función para comprimir y redimensionar imagen
+const compressImage = (file: File): Promise<File> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target?.result as string;
+      img.onload = () => {
+        // Configuración de compresión
+        const MAX_WIDTH = 800;
+        const MAX_HEIGHT = 800;
+        const QUALITY = 0.8;
+
+        let width = img.width;
+        let height = img.height;
+
+        // Redimensionar si es necesario manteniendo aspect ratio
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height = (height * MAX_WIDTH) / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width = (width * MAX_HEIGHT) / height;
+            height = MAX_HEIGHT;
+          }
+        }
+
+        // Crear canvas y comprimir
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+
+        if (!ctx) {
+          reject(new Error("No se pudo crear el contexto del canvas"));
+          return;
+        }
+
+        ctx.drawImage(img, 0, 0, width, height);
+
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) {
+              reject(new Error("Error al comprimir la imagen"));
+              return;
+            }
+            // Crear nuevo File con el blob comprimido
+            const compressedFile = new File([blob], file.name, {
+              type: "image/jpeg",
+              lastModified: Date.now(),
+            });
+            resolve(compressedFile);
+          },
+          "image/jpeg",
+          QUALITY
+        );
+      };
+      img.onerror = () => reject(new Error("Error al cargar la imagen"));
+    };
+    reader.onerror = () => reject(new Error("Error al leer el archivo"));
+  });
+};
 
 const CreateProfile: FC = () => {
-  const { displayName, photoURL } = useProfileContext();
+  const { displayName, photoURL: authPhotoURL } = useProfileContext();
   const { userProfile, updateProfile, isLoading: isSaving } = useUserProfile();
   const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Estado para la foto
+  const [photoURL, setPhotoURL] = useState<string>(userProfile?.photoURL || authPhotoURL || "");
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
   // Calcular valores iniciales del formulario
   const initialFormData = useMemo(
@@ -31,9 +104,72 @@ const CreateProfile: FC = () => {
     setFormData(initialFormData);
   }, [initialFormData]);
 
+  // Actualizar foto cuando cambie el perfil
+  useEffect(() => {
+    if (userProfile?.photoURL) {
+      setPhotoURL(userProfile.photoURL);
+    } else if (authPhotoURL) {
+      setPhotoURL(authPhotoURL);
+    }
+  }, [userProfile?.photoURL, authPhotoURL]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validar tipo de archivo con lista blanca
+    const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+    if (!allowedTypes.includes(file.type)) {
+      alert("Solo se permiten imágenes JPG, PNG o WebP");
+      return;
+    }
+
+    // Validar tamaño inicial (max 10MB antes de comprimir)
+    if (file.size > 10 * 1024 * 1024) {
+      alert("La imagen es demasiado grande. Por favor selecciona una imagen menor a 10MB");
+      return;
+    }
+
+    setUploadingPhoto(true);
+    try {
+      const currentUser = auth.currentUser;
+      if (!currentUser) throw new Error("Usuario no autenticado");
+
+      // Comprimir y redimensionar imagen
+      const compressedFile = await compressImage(file);
+
+      // Validar tamaño final después de comprimir (max 2MB)
+      if (compressedFile.size > 2 * 1024 * 1024) {
+        alert("La imagen sigue siendo muy pesada después de comprimirse. Intenta con otra imagen.");
+        setUploadingPhoto(false);
+        return;
+      }
+
+      // Crear referencia única en Storage
+      const storageRef = ref(
+        storage,
+        `profile-photos/${currentUser.uid}/${Date.now()}_${file.name}`
+      );
+
+      // Subir archivo comprimido
+      await uploadBytes(storageRef, compressedFile);
+
+      // Obtener URL de descarga
+      const downloadURL = await getDownloadURL(storageRef);
+
+      // Actualizar estado local
+      setPhotoURL(downloadURL);
+    } catch (error) {
+      console.error("Error al subir foto:", error);
+      alert("Error al subir la foto. Intenta nuevamente.");
+    } finally {
+      setUploadingPhoto(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -75,17 +211,45 @@ const CreateProfile: FC = () => {
               onSubmit={handleSubmit}
               className="relative bg-white border-4 border-black p-6 md:p-8 rounded-xl flex flex-col gap-6"
             >
-              {/* Sección Foto (Read Only visualmente por ahora) */}
+              {/* Sección Foto - Ahora editable */}
               <div className="flex justify-center mb-4">
-                <div className="w-32 h-32 bg-slate-200 border-4 border-black rounded-full overflow-hidden relative">
-                  {photoURL ? (
-                    <img src={photoURL} alt="Profile" className="w-full h-full object-cover" />
-                  ) : (
-                    <User
-                      size={64}
-                      className="text-slate-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-                    />
-                  )}
+                <div className="relative group">
+                  <div className="w-32 h-32 bg-slate-200 border-4 border-black rounded-full overflow-hidden relative cursor-pointer hover:opacity-90 transition-opacity">
+                    {uploadingPhoto ? (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+                        <div className="text-white font-bold text-sm">Subiendo...</div>
+                      </div>
+                    ) : photoURL ? (
+                      <img src={photoURL} alt="Profile" className="w-full h-full object-cover" />
+                    ) : (
+                      <User
+                        size={64}
+                        className="text-slate-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+                      />
+                    )}
+                    {/* Overlay hover */}
+                    <div
+                      className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      <Camera className="text-white" size={32} />
+                    </div>
+                  </div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handlePhotoChange}
+                    className="hidden"
+                  />
+                  {/* Botón de cámara */}
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="absolute -bottom-2 -right-2 bg-cyan-400 hover:bg-cyan-500 border-4 border-black rounded-full p-2 shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] transition-all"
+                  >
+                    <Camera size={20} />
+                  </button>
                 </div>
               </div>
 

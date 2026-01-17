@@ -25,7 +25,7 @@ const ContentSection: FC<ContentSectionProps> = ({
   return (
     <section
       className={cn(
-        `flex flex-col items-center min-h-fit gap-6 md:gap-10 py-12 px-4 md:px-8 ${bgColor ?? "transparent"}`,
+        `w-full max-w-7xl mx-auto flex flex-col items-center min-h-fit gap-6 md:gap-10 py-12 px-4 md:px-8 ${bgColor ?? "transparent"}`,
         className
       )}
     >

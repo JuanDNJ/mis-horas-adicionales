@@ -3,6 +3,7 @@ import { ProfileContext, UserContext } from ".";
 import type { UserProfile } from "./types";
 import { firestore, auth } from "@/lib/firebase";
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from "firebase/firestore";
+import { updateProfile as updateAuthProfile } from "firebase/auth";
 
 export const ProfileProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const userContext = useContext(UserContext);
@@ -54,6 +55,15 @@ export const ProfileProvider: React.FC<{ children: ReactNode }> = ({ children })
 
     setIsLoading(true);
     try {
+      // 1. Actualizar displayName y photoURL en Firebase Authentication si cambiaron
+      if (data.displayName !== undefined || data.photoURL !== undefined) {
+        await updateAuthProfile(currentUser, {
+          displayName: data.displayName ?? currentUser.displayName,
+          photoURL: data.photoURL ?? currentUser.photoURL,
+        });
+      }
+
+      // 2. Actualizar perfil en Firestore
       const docRef = doc(firestore, "profiles", currentUser.uid);
       const docSnap = await getDoc(docRef);
 
