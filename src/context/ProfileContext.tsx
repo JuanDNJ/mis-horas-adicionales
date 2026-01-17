@@ -2,6 +2,7 @@ import { useContext, useEffect, useState, useCallback, type ReactNode } from "re
 import { ProfileContext, UserContext } from ".";
 import type { UserProfile, JobProfile } from "./types";
 import { firestore, auth } from "@/lib/firebase";
+import { updateCompanyNameInRecords } from "@/lib/hoursService";
 import {
   doc,
   getDoc,
@@ -142,21 +143,19 @@ export const ProfileProvider: React.FC<{ children: ReactNode }> = ({ children })
       }
       // -------------------------------------------------------------
 
+      // Ordenar por 'updatedAt' descendente (el más reciente primero)
+      // Esto asegura que el "Último Activo" sea siempre el primero de la lista
+      jobs.sort((a, b) => {
+        const timeA = a.updatedAt?.getTime() || 0;
+        const timeB = b.updatedAt?.getTime() || 0;
+        return timeB - timeA;
+      });
+
       setJobProfiles(jobs);
 
-      // Determinar cuál activating
+      // Determinar cuál activar: Siempre el más reciente (jobs[0])
       if (jobs.length > 0) {
-        // 1. Intentar recuperar último usado
-        const lastActiveId = localStorage.getItem("lastActiveJobId");
-        const lastActive = jobs.find((j) => j.id === lastActiveId);
-
-        if (lastActive) {
-          setActiveJobProfileState(lastActive);
-        } else {
-          // 2. Buscar default
-          const defaultJob = jobs.find((j) => j.isDefault);
-          setActiveJobProfileState(defaultJob || jobs[0]);
-        }
+        setActiveJobProfileState(jobs[0]);
       } else {
         setActiveJobProfileState(null);
       }
@@ -256,6 +255,27 @@ export const ProfileProvider: React.FC<{ children: ReactNode }> = ({ children })
     try {
       const jobRef = doc(firestore, "profiles", currentUser.uid, "jobs", id);
 
+      // --- Lógica de sincronización de nombre de empresa ---
+      // Si estamos actualizando el nombre de la empresa, actualizamos también todos los registros asociados
+      // Esto debe hacerse ANTES de decidir cómo guardar (batch vs update simple) para asegurar que siempre corra.
+      if (data.companyName) {
+        const currentJob = jobProfiles.find((j) => j.id === id);
+        // Si existe el job y el nombre es diferente y no está vacío
+        if (
+          currentJob &&
+          currentJob.companyName !== data.companyName &&
+          currentJob.companyName.trim() !== ""
+        ) {
+          // Llamamos a la función de migración
+          await updateCompanyNameInRecords(
+            currentUser.uid,
+            currentJob.companyName,
+            data.companyName
+          );
+        }
+      }
+      // ----------------------------------------------------
+
       // Si marcamos como default este, debemos desmarcar otros
       if (data.isDefault === true) {
         const batch = writeBatch(firestore);
@@ -270,8 +290,8 @@ export const ProfileProvider: React.FC<{ children: ReactNode }> = ({ children })
             batch.update(d.ref, { isDefault: false });
           }
         });
-        // Update target
-        batch.update(jobRef, { ...data, updatedAt: serverTimestamp() });
+        // Update target - NO actualizamos 'updatedAt' para no alterar el orden de "Último Activo"
+        batch.update(jobRef, { ...data });
         await batch.commit();
       } else {
         // Normal update

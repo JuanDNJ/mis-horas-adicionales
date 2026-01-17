@@ -239,7 +239,7 @@ export const HoursForm = ({ formData, onChange, setFormData }: HoursFormProps) =
       : "Selecciona una fecha";
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-4 md:p-8 bg-header-bg border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] space-y-6">
+    <div className="w-full max-w-2xl mx-auto p-4 md:p-6 bg-header-bg border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] space-y-4">
       <div className="text-center mb-8 border-b-4 border-black pb-4">
         <h2 className="text-3xl font-black uppercase text-theme-color drop-shadow-sm">
           Registro de Horas

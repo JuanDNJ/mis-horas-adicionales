@@ -43,7 +43,7 @@ const Header: FC = () => {
         {isAuthenticated && activeJobProfile && (
           <div className="flex flex-col items-end mr-2 px-2 py-0.5 md:px-3 md:py-1 bg-white/50 border-2 border-black rounded shadow-[2px_2px_0_0_rgba(0,0,0,1)] max-w-30 md:max-w-none">
             <span className="text-[8px] md:text-[10px] font-bold uppercase text-gray-500 leading-none mb-0.5">
-              Trabajando en
+              Último Activo
             </span>
             <span className="font-black uppercase text-[10px] md:text-xs leading-none flex items-center gap-1 truncate w-full justify-end">
               <Briefcase size={10} className="md:w-3 md:h-3 shrink-0" />{" "}

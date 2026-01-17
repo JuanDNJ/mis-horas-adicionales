@@ -1,7 +1,7 @@
 import Header from "@/components/Header";
 import Main from "@/components/Main";
 import { type FC, useState, useEffect, useRef } from "react";
-import { Save, User, Briefcase, Hash, Camera, Plus, Trash2, Edit, Check } from "lucide-react";
+import { Save, User, Briefcase, Hash, Camera, Plus, Trash2, Edit, Check, Star } from "lucide-react";
 import { useProfileContext } from "@/hooks/useProfileContext";
 import { storage, auth } from "@/lib/firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
@@ -72,7 +72,6 @@ const CreateProfile: FC = () => {
     addJobProfile,
     updateJobProfile,
     deleteJobProfile,
-    setActiveJobProfile,
   } = useProfileContext();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -245,8 +244,9 @@ const CreateProfile: FC = () => {
 
   const handleSetDefault = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
+    // Al establecer como default NO actualizamos el timestamp (gracias al cambio en Context)
+    // por lo que NO cambiará el "Último Activo"
     await updateJobProfile(id, { isDefault: true });
-    setActiveJobProfile(id); // También lo hacemos activo al momento
   };
 
   return (
@@ -454,11 +454,7 @@ const CreateProfile: FC = () => {
                     jobProfiles.map((job) => (
                       <div
                         key={job.id}
-                        className={`relative group transition-transform hover:-translate-y-1 duration-200 cursor-pointer ${activeJobProfile?.id === job.id ? "z-10" : ""}`}
-                        onClick={() => {
-                          setActiveJobProfile(job.id);
-                          // Opcional: Navegar al dashboard o dar feedback
-                        }}
+                        className={`relative group transition-transform hover:-translate-y-1 duration-200 ${activeJobProfile?.id === job.id ? "z-10" : ""}`}
                       >
                         {/* Sombra */}
                         <div
@@ -521,10 +517,10 @@ const CreateProfile: FC = () => {
                             {!job.isDefault && (
                               <button
                                 onClick={(e) => handleSetDefault(job.id, e)}
-                                className="p-1.5 hover:bg-yellow-100 rounded text-yellow-600 text-xs font-bold"
+                                className="p-1.5 hover:bg-yellow-100 rounded text-yellow-600 border-2 border-transparent hover:border-yellow-200"
                                 title="Marcar como Principal"
                               >
-                                ★
+                                <Star size={18} />
                               </button>
                             )}
                           </div>

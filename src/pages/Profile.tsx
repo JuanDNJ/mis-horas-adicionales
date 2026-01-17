@@ -1,6 +1,6 @@
 import Header from "@/components/Header";
 import Main from "@/components/Main";
-import { type FC } from "react";
+import { type FC, useEffect, useState } from "react";
 import {
   User,
   Zap,
@@ -15,6 +15,9 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useUserContext } from "@/hooks/useUserContext";
 import { useProfileContext } from "@/hooks/useProfileContext";
+import { getUserHoursRecords } from "@/lib/hoursService";
+import { auth } from "@/lib/firebase";
+import { HoursChart } from "@/components/HoursChart";
 
 const Profile: FC = () => {
   // Obtenemos datos básicos del contexto global/autenticación
@@ -22,6 +25,59 @@ const Profile: FC = () => {
   // Obtenemos el perfil completo de Firestore
   const { userProfile, activeJobProfile, isLoading } = useProfileContext();
   const navigate = useNavigate();
+
+  const [hoursSummary, setHoursSummary] = useState<{ company: string; total: number }[]>([]);
+  const [grandTotal, setGrandTotal] = useState<number>(0);
+
+  useEffect(() => {
+    const fetchHours = async () => {
+      if (auth.currentUser) {
+        try {
+          const records = await getUserHoursRecords(auth.currentUser.uid);
+
+          // Agrupar horas por empresa
+          const summaryMap: Record<string, number> = {};
+          let total = 0;
+
+          records.forEach((record) => {
+            const h = parseFloat(record.total_horas || "0");
+            const val = isNaN(h) ? 0 : h;
+            // Usar empresa del registro o "Sin Empresa"
+            const company = record.empresa?.trim() || "GENERAL";
+            const companyKey = company.toUpperCase(); // Normalizamos para agrupar
+
+            if (!summaryMap[companyKey]) {
+              summaryMap[companyKey] = 0;
+            }
+            summaryMap[companyKey] += val;
+            total += val;
+          });
+
+          // Convertir a array y ordenar (empresa del perfil activo primero si existe)
+          const summaryArray = Object.keys(summaryMap).map((key) => ({
+            company: key,
+            total: summaryMap[key],
+          }));
+
+          summaryArray.sort((a, b) => {
+            if (activeJobProfile && a.company === activeJobProfile.companyName.toUpperCase())
+              return -1;
+            if (activeJobProfile && b.company === activeJobProfile.companyName.toUpperCase())
+              return 1;
+            return b.total - a.total; // Las de más horas primero por defecto
+          });
+
+          setHoursSummary(summaryArray);
+          setGrandTotal(total);
+        } catch (error) {
+          console.error("Error cargando bolsa de horas:", error);
+        }
+      }
+    };
+
+    // Ejecutar cuando cambie el perfil activo o al montar
+    fetchHours();
+  }, [activeJobProfile]);
 
   // Preferimos los datos del perfil de Firestore, sino los de Auth
   const displayName = userProfile?.displayName || authDisplayName || "USUARIO ANONIMO";
@@ -195,13 +251,56 @@ const Profile: FC = () => {
                   {userProfile?.status || "INACTIVO"}
                 </div>
               </div>
-              <div className="flex items-end gap-2 flex-wrap">
-                <span className="text-5xl sm:text-6xl font-black leading-none tracking-tighter shadow-black drop-shadow-sm">
-                  0
-                </span>
-                <span className="text-lg sm:text-xl font-black uppercase underline decoration-white decoration-4 mb-2">
-                  Registradas!
-                </span>
+              <div className="flex flex-col gap-3">
+                {hoursSummary.length === 0 ? (
+                  <div className="flex items-end gap-2 flex-wrap">
+                    <span className="text-5xl sm:text-6xl font-black leading-none tracking-tighter shadow-black drop-shadow-sm">
+                      0
+                    </span>
+                    <span className="text-lg sm:text-xl font-black uppercase underline decoration-white decoration-4 mb-2">
+                      Registradas!
+                    </span>
+                  </div>
+                ) : (
+                  <div className="flex flex-col lg:flex-row gap-6">
+                    {/* Lista de horas textua */}
+                    <div className="flex-1">
+                      <div className=" max-h-[160px] overflow-y-auto pr-2 custom-scrollbar">
+                        {hoursSummary.map((item) => (
+                          <div
+                            key={item.company}
+                            className="flex justify-between items-center bg-black/10 p-2 rounded mb-2 last:mb-0 border border-black/5"
+                          >
+                            <span className="text-sm sm:text-base font-bold uppercase truncate max-w-[60%] leading-tight text-white drop-shadow-[1px_1px_0_rgba(0,0,0,0.5)]">
+                              {item.company}
+                            </span>
+                            <div className="flex items-baseline gap-1">
+                              <span className="text-2xl sm:text-3xl font-black leading-none text-white drop-shadow-[2px_2px_0_rgba(0,0,0,1)]">
+                                {item.total}
+                              </span>
+                              <span className="text-[10px] font-black uppercase text-white/80">
+                                HRS
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      {hoursSummary.length > 1 && (
+                        <div className="flex justify-between items-center pt-2 border-t-2 border-white/30 mt-1">
+                          <span className="text-xs font-black uppercase">TOTAL ACUMULADO</span>
+                          <span className="text-xl font-black">
+                            {grandTotal} <small className="text-[10px]">HRS</small>
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Grafico de estadisticas */}
+                    <div className="flex-1 min-w-[200px]">
+                      <HoursChart data={hoursSummary} />
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
