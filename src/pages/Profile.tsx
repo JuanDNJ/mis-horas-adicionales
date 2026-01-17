@@ -265,7 +265,7 @@ const Profile: FC = () => {
                   <div className="flex flex-col lg:flex-row gap-6">
                     {/* Lista de horas textua */}
                     <div className="flex-1">
-                      <div className=" max-h-[160px] overflow-y-auto pr-2 custom-scrollbar">
+                      <div className=" max-h-40 overflow-y-auto pr-2 custom-scrollbar">
                         {hoursSummary.map((item) => (
                           <div
                             key={item.company}
@@ -296,7 +296,7 @@ const Profile: FC = () => {
                     </div>
 
                     {/* Grafico de estadisticas */}
-                    <div className="flex-1 min-w-[200px]">
+                    <div className="flex-1 min-w-50">
                       <HoursChart data={hoursSummary} />
                     </div>
                   </div>

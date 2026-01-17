@@ -252,7 +252,7 @@ const Dashboard = () => {
           <div className="flex flex-col xl:flex-row items-start justify-center w-full gap-8">
             {/* Form Column - Conditional Rendering with Modal for Mobile */}
             {isFormOpen && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 xl:static xl:z-auto xl:bg-transparent xl:p-0 xl:backdrop-blur-none xl:flex-col xl:w-1/3 xl:min-w-[350px] xl:max-w-md animate-in fade-in duration-200 xl:slide-in-from-left transition-all">
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 xl:static xl:z-auto xl:bg-transparent xl:p-0 xl:backdrop-blur-none xl:flex-col xl:w-1/3 xl:min-w-87.5 xl:max-w-md animate-in fade-in duration-200 xl:slide-in-from-left transition-all">
                 {/* Scrollable Container for Mobile Modal */}
                 <div className="w-full max-h-[90vh] overflow-y-auto no-scrollbar xl:overflow-visible xl:max-h-none flex flex-col items-center gap-6 xl:gap-0">
                   {/* Close Button for Mobile Modal */}
