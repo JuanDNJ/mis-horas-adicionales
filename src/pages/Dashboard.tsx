@@ -7,20 +7,28 @@ import { DashboardToolbar } from "@/components/DashboardToolbar";
 import { FaPlus, FaTimes } from "react-icons/fa";
 import { calculateDuration, cn } from "@/lib/utils";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import { auth } from "@/lib/firebase";
+import {
+  createHoursRecord,
+  updateHoursRecord,
+  deleteHoursRecord,
+  getUserHoursRecords,
+  type HoursRecord,
+} from "@/lib/hoursService";
 
 const Dashboard = () => {
   const { userProfile } = useUserProfile();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Determinar si el perfil está completo
   const isProfileIncomplete =
     !userProfile || !userProfile.jobTitle || !userProfile.sector || !userProfile.employeeId;
 
-  const [horas, setHoras] = useState<HoursData[]>(() => {
-    const saved = localStorage.getItem("horas-data");
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [horas, setHoras] = useState<HoursRecord[]>([]);
   const [misHoras, setMisHoras] = useState<HoursData>({
     empresa: "",
     numero_empleado: "",
@@ -38,10 +46,29 @@ const Dashboard = () => {
     total_horas: "",
   });
 
-  // Persist horas to localStorage whenever it changes
+  // Cargar registros desde Firestore al montar el componente
   useEffect(() => {
-    localStorage.setItem("horas-data", JSON.stringify(horas));
-  }, [horas]);
+    const loadHoursRecords = async () => {
+      if (!auth.currentUser) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+        const records = await getUserHoursRecords(auth.currentUser.uid);
+        setHoras(records);
+        setError(null);
+      } catch (err) {
+        console.error("Error al cargar registros:", err);
+        setError("No se pudieron cargar los registros de horas");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadHoursRecords();
+  }, []);
 
   const handleHoursChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -56,41 +83,64 @@ const Dashboard = () => {
     });
   };
 
-  const handleAddHour = () => {
+  const handleAddHour = async () => {
     // Basic validation
     if (!misHoras.empresa || !misHoras.dia || !misHoras.hora_entrada) {
       alert("Por favor completa los campos obligatorios");
       return;
     }
 
-    if (editingIndex !== null) {
-      const updatedHoras = [...horas];
-      updatedHoras[editingIndex] = misHoras;
-      setHoras(updatedHoras);
-      setEditingIndex(null);
-    } else {
-      setHoras([...horas, misHoras]);
+    if (!auth.currentUser) {
+      alert("Debes estar autenticado para guardar registros");
+      return;
     }
 
-    // Reset form
-    setMisHoras({
-      empresa: "",
-      numero_empleado: "",
-      nombre: "",
-      apellido_paterno: "",
-      apellido_materno: "",
-      telefono: "",
-      dia: "",
-      mes: "",
-      anio: "",
-      hora_entrada: "",
-      hora_salida: "",
-      origen: "",
-      destino: "",
-      total_horas: "",
-      ramo: "",
-    });
-    setIsFormOpen(false);
+    try {
+      setIsSaving(true);
+      setError(null);
+
+      if (editingIndex !== null) {
+        // Actualizar registro existente
+        const recordToUpdate = horas[editingIndex];
+        if (recordToUpdate.id) {
+          await updateHoursRecord(recordToUpdate.id, misHoras);
+          const updatedRecords = await getUserHoursRecords(auth.currentUser.uid);
+          setHoras(updatedRecords);
+        }
+        setEditingIndex(null);
+      } else {
+        // Crear nuevo registro
+        await createHoursRecord(auth.currentUser.uid, misHoras);
+        const updatedRecords = await getUserHoursRecords(auth.currentUser.uid);
+        setHoras(updatedRecords);
+      }
+
+      // Reset form
+      setMisHoras({
+        empresa: "",
+        numero_empleado: "",
+        nombre: "",
+        apellido_paterno: "",
+        apellido_materno: "",
+        telefono: "",
+        dia: "",
+        mes: "",
+        anio: "",
+        hora_entrada: "",
+        hora_salida: "",
+        origen: "",
+        destino: "",
+        total_horas: "",
+        ramo: "",
+      });
+      setIsFormOpen(false);
+    } catch (err) {
+      console.error("Error al guardar registro:", err);
+      setError("No se pudo guardar el registro. Inténtalo de nuevo.");
+      alert("No se pudo guardar el registro. Inténtalo de nuevo.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleEditHour = (index: number) => {
@@ -99,11 +149,32 @@ const Dashboard = () => {
     setIsFormOpen(true);
   };
 
-  const handleDeleteHour = (index: number) => {
-    setHoras(horas.filter((_, i) => i !== index));
-    if (editingIndex === index) {
-      setEditingIndex(null);
-      setIsFormOpen(false);
+  const handleDeleteHour = async (index: number) => {
+    const recordToDelete = horas[index];
+
+    if (!recordToDelete.id) {
+      // Si no tiene ID, solo lo removemos localmente (no debería pasar)
+      setHoras(horas.filter((_, i) => i !== index));
+      return;
+    }
+
+    if (!confirm("¿Estás seguro de que quieres eliminar este registro?")) {
+      return;
+    }
+
+    try {
+      setError(null);
+      await deleteHoursRecord(recordToDelete.id);
+      setHoras(horas.filter((_, i) => i !== index));
+
+      if (editingIndex === index) {
+        setEditingIndex(null);
+        setIsFormOpen(false);
+      }
+    } catch (err) {
+      console.error("Error al eliminar registro:", err);
+      setError("No se pudo eliminar el registro. Inténtalo de nuevo.");
+      alert("No se pudo eliminar el registro. Inténtalo de nuevo.");
     }
   };
 
@@ -173,7 +244,11 @@ const Dashboard = () => {
                     onClick={() => {
                       handleAddHour();
                     }}
-                    className="mt-8 group flex items-center gap-3 bg-action-create text-white border-4 border-black font-black uppercase tracking-widest text-xl py-4 px-12 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer w-full justify-center xl:w-auto xl:mt-8"
+                    disabled={isSaving}
+                    className={cn(
+                      "mt-8 group flex items-center gap-3 bg-action-create text-white border-4 border-black font-black uppercase tracking-widest text-xl py-4 px-12 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer w-full justify-center xl:w-auto xl:mt-8",
+                      isSaving && "opacity-50 cursor-not-allowed"
+                    )}
                   >
                     <FaPlus
                       className={cn(
@@ -181,7 +256,7 @@ const Dashboard = () => {
                         editingIndex !== null ? "" : "group-hover:rotate-90"
                       )}
                     />
-                    {editingIndex !== null ? "Actualizar" : "Registrar"}
+                    {isSaving ? "Guardando..." : editingIndex !== null ? "Actualizar" : "Registrar"}
                   </button>
 
                   {/* Spacer for mobile scroll */}
@@ -192,7 +267,18 @@ const Dashboard = () => {
 
             {/* Table Column - Auto Expand */}
             <div className="w-full xl:flex-1 h-full animate-in fade-in duration-500">
-              <HoursTable data={horas} onDelete={handleDeleteHour} onEdit={handleEditHour} />
+              {error && (
+                <div className="mb-4 p-4 bg-red-100 border-2 border-red-500 text-red-700 font-bold">
+                  {error}
+                </div>
+              )}
+              {isLoading ? (
+                <div className="flex items-center justify-center p-8">
+                  <div className="text-theme-color font-bold text-xl">Cargando registros...</div>
+                </div>
+              ) : (
+                <HoursTable data={horas} onDelete={handleDeleteHour} onEdit={handleEditHour} />
+              )}
             </div>
           </div>
         </div>
