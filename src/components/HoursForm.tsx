@@ -132,6 +132,50 @@ export const HoursForm = ({ formData, onChange, setFormData }: HoursFormProps) =
     setSector(calculatedSector);
   }, [calculatedSector]);
 
+  // Autocomplete form data from user profile on mount
+  useEffect(() => {
+    if (userProfile && setFormData) {
+      setFormData((prev) => {
+        // Only autocomplete if main fields are empty (new record)
+        if (prev.nombre || prev.numero_empleado) {
+          return prev;
+        }
+
+        const parts = (userProfile.displayName || "").trim().split(/\s+/);
+        let nombre = "";
+        let apellido_paterno = "";
+        let apellido_materno = "";
+
+        if (parts.length > 0) {
+          if (parts.length === 1) {
+            nombre = parts[0];
+          } else if (parts.length === 2) {
+            nombre = parts[0];
+            apellido_paterno = parts[1];
+          } else if (parts.length === 3) {
+            nombre = parts[0];
+            apellido_paterno = parts[1];
+            apellido_materno = parts[2];
+          } else {
+            // 4 or more parts: Last two are surnames, rest is name
+            apellido_materno = parts[parts.length - 1];
+            apellido_paterno = parts[parts.length - 2];
+            nombre = parts.slice(0, parts.length - 2).join(" ");
+          }
+        }
+
+        return {
+          ...prev,
+          numero_empleado: userProfile.employeeId || "",
+          telefono: userProfile.phoneNumber || "",
+          nombre: nombre,
+          apellido_paterno: apellido_paterno,
+          apellido_materno: apellido_materno,
+        };
+      });
+    }
+  }, [userProfile, setFormData]);
+
   // Helper to handle date selection from Calendar
   const handleDateSelect = (date: Date | undefined) => {
     if (date && setFormData) {
