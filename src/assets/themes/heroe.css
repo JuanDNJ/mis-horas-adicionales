@@ -16,6 +16,7 @@
   --action-edit: #eab308;
   --action-delete: #1d4ed8;
   --action-update: #22c55e;
+  --font-theme: "Bangers", system-ui;
   background-color: var(--theme-bg);
   color: var(--theme-color);
 }
