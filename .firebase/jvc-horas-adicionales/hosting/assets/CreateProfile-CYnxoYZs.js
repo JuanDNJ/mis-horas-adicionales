@@ -1,1 +1,357 @@
-import{Z as e,_ as t,c as n,f as r,it as i,lt as a,o,u as s,v as c,y as l}from"./vendor-CuWPEnc8.js";import{i as u,r as d,t as f}from"./firebase-CTKiUIgJ.js";import{a as p,r as m,t as h}from"./index-CSZ_YMvB.js";import{n as g,t as _}from"./Main-B5QIXc64.js";import{t as v}from"./useUserProfile-DVLzSzBY.js";var y=a(),b=e(),x=e=>new Promise((t,n)=>{let r=new FileReader;r.readAsDataURL(e),r.onload=r=>{let i=new Image;i.src=r.target?.result,i.onload=()=>{let r=i.width,a=i.height;r>a?r>800&&(a=a*800/r,r=800):a>800&&(r=r*800/a,a=800);let o=document.createElement(`canvas`);o.width=r,o.height=a;let s=o.getContext(`2d`);if(!s){n(Error(`No se pudo crear el contexto del canvas`));return}s.drawImage(i,0,0,r,a),o.toBlob(r=>{if(!r){n(Error(`Error al comprimir la imagen`));return}t(new File([r],e.name,{type:`image/jpeg`,lastModified:Date.now()}))},`image/jpeg`,.8)},i.onerror=()=>n(Error(`Error al cargar la imagen`))},r.onerror=()=>n(Error(`Error al leer el archivo`))}),S=()=>{let{displayName:e,photoURL:a}=p(),{userProfile:S,updateProfile:C,isLoading:w}=v(),T=i(),E=(0,y.useRef)(null),[D,O]=(0,y.useState)(S?.photoURL||a||``),[k,A]=(0,y.useState)(!1),j=(0,y.useMemo)(()=>({displayName:S?.displayName||e||``,jobTitle:S?.jobTitle||``,sector:S?.sector||``,employeeId:S?.employeeId||``,phoneNumber:S?.phoneNumber||``}),[S,e]),[M,N]=(0,y.useState)(j);(0,y.useEffect)(()=>{N(j)},[j]),(0,y.useEffect)(()=>{S?.photoURL?O(S.photoURL):a&&O(a)},[S?.photoURL,a]);let P=e=>{let{name:t,value:n}=e.target;N(e=>({...e,[t]:n}))};return(0,b.jsxs)(b.Fragment,{children:[(0,b.jsx)(g,{}),(0,b.jsx)(_,{children:(0,b.jsxs)(`div`,{className:`w-full max-w-2xl mx-auto p-4 md:p-6 font-mono`,children:[(0,b.jsxs)(`div`,{className:`mb-8 text-center relative`,children:[(0,b.jsx)(`h1`,{className:`text-4xl md:text-5xl font-black uppercase italic tracking-tighter text-black drop-shadow-[3px_3px_0_rgba(255,255,255,1)]`,children:S?`Editar Perfil`:`Crear Perfil`}),(0,b.jsx)(`div`,{className:`absolute -top-4 -right-2 md:right-10 rotate-12 bg-cyan-400 border-4 border-black px-3 py-1 text-sm font-bold shadow-[4px_4px_0_0_#000]`,children:S?`Actualizar`:`¡Nuevo!`})]}),(0,b.jsxs)(`div`,{className:`relative`,children:[(0,b.jsx)(`div`,{className:`absolute inset-0 bg-black translate-x-3 translate-y-3 rounded-xl`}),(0,b.jsxs)(`form`,{onSubmit:async e=>{e.preventDefault();try{await C({displayName:M.displayName,jobTitle:M.jobTitle,sector:M.sector,employeeId:M.employeeId,phoneNumber:M.phoneNumber,photoURL:D||``}),T(`/profile`)}catch(e){console.error(`Error al guardar:`,e),alert(`Error al guardar el perfil. Intenta nuevamente.`)}},className:`relative bg-white border-4 border-black p-6 md:p-8 rounded-xl flex flex-col gap-6`,children:[(0,b.jsx)(`div`,{className:`flex justify-center mb-4`,children:(0,b.jsxs)(`div`,{className:`relative group`,children:[(0,b.jsxs)(`div`,{className:`w-32 h-32 bg-slate-200 border-4 border-black rounded-full overflow-hidden relative cursor-pointer hover:opacity-90 transition-opacity`,children:[k?(0,b.jsx)(`div`,{className:`absolute inset-0 flex items-center justify-center bg-black/50`,children:(0,b.jsx)(`div`,{className:`text-white font-bold text-sm`,children:`Subiendo...`})}):D?(0,b.jsx)(`img`,{src:D,alt:`Profile`,className:`w-full h-full object-cover`}):(0,b.jsx)(o,{size:64,className:`text-slate-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2`}),(0,b.jsx)(`div`,{className:`absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity`,onClick:()=>E.current?.click(),children:(0,b.jsx)(t,{className:`text-white`,size:32})})]}),(0,b.jsx)(`input`,{ref:E,type:`file`,accept:`image/*`,onChange:async e=>{let t=e.target.files?.[0];if(t){if(![`image/jpeg`,`image/jpg`,`image/png`,`image/webp`].includes(t.type)){alert(`Solo se permiten imágenes JPG, PNG o WebP`);return}if(t.size>10*1024*1024){alert(`La imagen es demasiado grande. Por favor selecciona una imagen menor a 10MB`);return}A(!0);try{let e=h.currentUser;if(!e)throw Error(`Usuario no autenticado`);let n=await x(t);if(n.size>2*1024*1024){alert(`La imagen sigue siendo muy pesada después de comprimirse. Intenta con otra imagen.`),A(!1);return}let r=d(m,`profile-photos/${e.uid}/${Date.now()}_${t.name}`);await u(r,n),O(await f(r))}catch(e){console.error(`Error al subir foto:`,e),alert(`Error al subir la foto. Intenta nuevamente.`)}finally{A(!1)}}},className:`hidden`}),(0,b.jsx)(`button`,{type:`button`,onClick:()=>E.current?.click(),className:`absolute -bottom-2 -right-2 bg-cyan-400 hover:bg-cyan-500 border-4 border-black rounded-full p-2 shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] transition-all`,children:(0,b.jsx)(t,{size:20})})]})}),(0,b.jsxs)(`div`,{className:`space-y-4`,children:[(0,b.jsxs)(`div`,{className:`flex flex-col gap-2`,children:[(0,b.jsxs)(`label`,{className:`font-black uppercase text-sm flex items-center gap-2`,children:[(0,b.jsx)(o,{size:18}),` Nombre Completo`]}),(0,b.jsx)(`input`,{type:`text`,name:`displayName`,value:M.displayName,onChange:P,className:`w-full bg-yellow-100 border-4 border-black p-3 font-bold focus:outline-none focus:bg-yellow-200 focus:shadow-[4px_4px_0_0_#000] transition-all`,placeholder:`Tu nombre...`})]}),(0,b.jsxs)(`div`,{className:`grid grid-cols-1 md:grid-cols-2 gap-4`,children:[(0,b.jsxs)(`div`,{className:`flex flex-col gap-2`,children:[(0,b.jsxs)(`label`,{className:`font-black uppercase text-sm flex items-center gap-2`,children:[(0,b.jsx)(l,{size:18}),` Cargo / Puesto`]}),(0,b.jsx)(`input`,{type:`text`,name:`jobTitle`,value:M.jobTitle,onChange:P,className:`w-full bg-white border-4 border-black p-3 font-bold focus:outline-none focus:bg-cyan-100 focus:shadow-[4px_4px_0_0_#000] transition-all`,placeholder:`Ej. Diseñador`})]}),(0,b.jsxs)(`div`,{className:`flex flex-col gap-2`,children:[(0,b.jsxs)(`label`,{className:`font-black uppercase text-sm flex items-center gap-2`,children:[(0,b.jsx)(c,{size:18}),` Sector`]}),(0,b.jsxs)(`select`,{name:`sector`,value:M.sector,onChange:P,className:`w-full bg-white border-4 border-black p-3 font-bold focus:outline-none focus:bg-cyan-100 focus:shadow-[4px_4px_0_0_#000] transition-all appearance-none cursor-pointer`,children:[(0,b.jsx)(`option`,{value:``,children:`Seleccionar...`}),(0,b.jsx)(`option`,{value:`Tecnología`,children:`Tecnología`}),(0,b.jsx)(`option`,{value:`Recursos Humanos`,children:`Recursos Humanos`}),(0,b.jsx)(`option`,{value:`Operaciones`,children:`Operaciones`}),(0,b.jsx)(`option`,{value:`Ventas`,children:`Ventas`}),(0,b.jsx)(`option`,{value:`Transporte`,children:`Transporte`}),(0,b.jsx)(`option`,{value:`Otro`,children:`Otro`})]})]})]}),(0,b.jsxs)(`div`,{className:`flex flex-col gap-2`,children:[(0,b.jsxs)(`label`,{className:`font-black uppercase text-sm flex items-center gap-2`,children:[(0,b.jsx)(r,{size:18}),` ID de Empleado`]}),(0,b.jsx)(`input`,{type:`text`,name:`employeeId`,value:M.employeeId,onChange:P,className:`w-full bg-white border-4 border-black p-3 font-bold focus:outline-none focus:bg-cyan-100 focus:shadow-[4px_4px_0_0_#000] transition-all`,placeholder:`Ej. EMP-001`})]}),(0,b.jsxs)(`div`,{className:`flex flex-col gap-2`,children:[(0,b.jsxs)(`label`,{className:`font-black uppercase text-sm flex items-center gap-2`,children:[(0,b.jsx)(s,{size:18}),` Telefono`]}),(0,b.jsx)(`input`,{type:`tel`,name:`phoneNumber`,value:M.phoneNumber,onChange:P,className:`w-full bg-white border-4 border-black p-3 font-bold focus:outline-none focus:bg-cyan-100 focus:shadow-[4px_4px_0_0_#000] transition-all`,placeholder:`Ej. +34 600 000 000`})]})]}),(0,b.jsx)(`button`,{type:`submit`,disabled:w,className:`mt-4 bg-red-500 hover:bg-red-400 disabled:bg-gray-400 text-white font-black uppercase text-xl py-4 border-4 border-black shadow-[6px_6px_0_0_#000] hover:translate-x-1 hover:translate-y-1 hover:shadow-[2px_2px_0_0_#000] transition-all flex items-center justify-center gap-3 cursor-pointer`,children:w?`Guardando...`:(0,b.jsxs)(b.Fragment,{children:[(0,b.jsx)(n,{size:24}),` Guardar Perfil`]})})]})]})]})})]})};export{S as default};
+import {
+  Z as e,
+  _ as t,
+  c as n,
+  f as r,
+  it as i,
+  lt as a,
+  o,
+  u as s,
+  v as c,
+  y as l,
+} from "./vendor-CuWPEnc8.js";
+import { i as u, r as d, t as f } from "./firebase-CTKiUIgJ.js";
+import { a as p, r as m, t as h } from "./index-CSZ_YMvB.js";
+import { n as g, t as _ } from "./Main-B5QIXc64.js";
+import { t as v } from "./useUserProfile-DVLzSzBY.js";
+var y = a(),
+  b = e(),
+  x = (e) =>
+    new Promise((t, n) => {
+      let r = new FileReader();
+      (r.readAsDataURL(e),
+        (r.onload = (r) => {
+          let i = new Image();
+          ((i.src = r.target?.result),
+            (i.onload = () => {
+              let r = i.width,
+                a = i.height;
+              r > a
+                ? r > 800 && ((a = (a * 800) / r), (r = 800))
+                : a > 800 && ((r = (r * 800) / a), (a = 800));
+              let o = document.createElement(`canvas`);
+              ((o.width = r), (o.height = a));
+              let s = o.getContext(`2d`);
+              if (!s) {
+                n(Error(`No se pudo crear el contexto del canvas`));
+                return;
+              }
+              (s.drawImage(i, 0, 0, r, a),
+                o.toBlob(
+                  (r) => {
+                    if (!r) {
+                      n(Error(`Error al comprimir la imagen`));
+                      return;
+                    }
+                    t(new File([r], e.name, { type: `image/jpeg`, lastModified: Date.now() }));
+                  },
+                  `image/jpeg`,
+                  0.8
+                ));
+            }),
+            (i.onerror = () => n(Error(`Error al cargar la imagen`))));
+        }),
+        (r.onerror = () => n(Error(`Error al leer el archivo`))));
+    }),
+  S = () => {
+    let { displayName: e, photoURL: a } = p(),
+      { userProfile: S, updateProfile: C, isLoading: w } = v(),
+      T = i(),
+      E = (0, y.useRef)(null),
+      [D, O] = (0, y.useState)(S?.photoURL || a || ``),
+      [k, A] = (0, y.useState)(!1),
+      j = (0, y.useMemo)(
+        () => ({
+          displayName: S?.displayName || e || ``,
+          jobTitle: S?.jobTitle || ``,
+          sector: S?.sector || ``,
+          employeeId: S?.employeeId || ``,
+          phoneNumber: S?.phoneNumber || ``,
+        }),
+        [S, e]
+      ),
+      [M, N] = (0, y.useState)(j);
+    ((0, y.useEffect)(() => {
+      N(j);
+    }, [j]),
+      (0, y.useEffect)(() => {
+        S?.photoURL ? O(S.photoURL) : a && O(a);
+      }, [S?.photoURL, a]));
+    let P = (e) => {
+      let { name: t, value: n } = e.target;
+      N((e) => ({ ...e, [t]: n }));
+    };
+    return (0, b.jsxs)(b.Fragment, {
+      children: [
+        (0, b.jsx)(g, {}),
+        (0, b.jsx)(_, {
+          children: (0, b.jsxs)(`div`, {
+            className: `w-full max-w-2xl mx-auto p-4 md:p-6 font-mono`,
+            children: [
+              (0, b.jsxs)(`div`, {
+                className: `mb-8 text-center relative`,
+                children: [
+                  (0, b.jsx)(`h1`, {
+                    className: `text-4xl md:text-5xl font-black uppercase italic tracking-tighter text-black drop-shadow-[3px_3px_0_rgba(255,255,255,1)]`,
+                    children: S ? `Editar Perfil` : `Crear Perfil`,
+                  }),
+                  (0, b.jsx)(`div`, {
+                    className: `absolute -top-4 -right-2 md:right-10 rotate-12 bg-cyan-400 border-4 border-black px-3 py-1 text-sm font-bold shadow-[4px_4px_0_0_#000]`,
+                    children: S ? `Actualizar` : `¡Nuevo!`,
+                  }),
+                ],
+              }),
+              (0, b.jsxs)(`div`, {
+                className: `relative`,
+                children: [
+                  (0, b.jsx)(`div`, {
+                    className: `absolute inset-0 bg-black translate-x-3 translate-y-3 rounded-xl`,
+                  }),
+                  (0, b.jsxs)(`form`, {
+                    onSubmit: async (e) => {
+                      e.preventDefault();
+                      try {
+                        (await C({
+                          displayName: M.displayName,
+                          jobTitle: M.jobTitle,
+                          sector: M.sector,
+                          employeeId: M.employeeId,
+                          phoneNumber: M.phoneNumber,
+                          photoURL: D || ``,
+                        }),
+                          T(`/profile`));
+                      } catch (e) {
+                        (console.error(`Error al guardar:`, e),
+                          alert(`Error al guardar el perfil. Intenta nuevamente.`));
+                      }
+                    },
+                    className: `relative bg-white border-4 border-black p-6 md:p-8 rounded-xl flex flex-col gap-6`,
+                    children: [
+                      (0, b.jsx)(`div`, {
+                        className: `flex justify-center mb-4`,
+                        children: (0, b.jsxs)(`div`, {
+                          className: `relative group`,
+                          children: [
+                            (0, b.jsxs)(`div`, {
+                              className: `w-32 h-32 bg-slate-200 border-4 border-black rounded-full overflow-hidden relative cursor-pointer hover:opacity-90 transition-opacity`,
+                              children: [
+                                k
+                                  ? (0, b.jsx)(`div`, {
+                                      className: `absolute inset-0 flex items-center justify-center bg-black/50`,
+                                      children: (0, b.jsx)(`div`, {
+                                        className: `text-white font-bold text-sm`,
+                                        children: `Subiendo...`,
+                                      }),
+                                    })
+                                  : D
+                                    ? (0, b.jsx)(`img`, {
+                                        src: D,
+                                        alt: `Profile`,
+                                        className: `w-full h-full object-cover`,
+                                      })
+                                    : (0, b.jsx)(o, {
+                                        size: 64,
+                                        className: `text-slate-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2`,
+                                      }),
+                                (0, b.jsx)(`div`, {
+                                  className: `absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity`,
+                                  onClick: () => E.current?.click(),
+                                  children: (0, b.jsx)(t, { className: `text-white`, size: 32 }),
+                                }),
+                              ],
+                            }),
+                            (0, b.jsx)(`input`, {
+                              ref: E,
+                              type: `file`,
+                              accept: `image/*`,
+                              onChange: async (e) => {
+                                let t = e.target.files?.[0];
+                                if (t) {
+                                  if (
+                                    ![
+                                      `image/jpeg`,
+                                      `image/jpg`,
+                                      `image/png`,
+                                      `image/webp`,
+                                    ].includes(t.type)
+                                  ) {
+                                    alert(`Solo se permiten imágenes JPG, PNG o WebP`);
+                                    return;
+                                  }
+                                  if (t.size > 10 * 1024 * 1024) {
+                                    alert(
+                                      `La imagen es demasiado grande. Por favor selecciona una imagen menor a 10MB`
+                                    );
+                                    return;
+                                  }
+                                  A(!0);
+                                  try {
+                                    let e = h.currentUser;
+                                    if (!e) throw Error(`Usuario no autenticado`);
+                                    let n = await x(t);
+                                    if (n.size > 2 * 1024 * 1024) {
+                                      (alert(
+                                        `La imagen sigue siendo muy pesada después de comprimirse. Intenta con otra imagen.`
+                                      ),
+                                        A(!1));
+                                      return;
+                                    }
+                                    let r = d(m, `profile-photos/${e.uid}/${Date.now()}_${t.name}`);
+                                    (await u(r, n), O(await f(r)));
+                                  } catch (e) {
+                                    (console.error(`Error al subir foto:`, e),
+                                      alert(`Error al subir la foto. Intenta nuevamente.`));
+                                  } finally {
+                                    A(!1);
+                                  }
+                                }
+                              },
+                              className: `hidden`,
+                            }),
+                            (0, b.jsx)(`button`, {
+                              type: `button`,
+                              onClick: () => E.current?.click(),
+                              className: `absolute -bottom-2 -right-2 bg-cyan-400 hover:bg-cyan-500 border-4 border-black rounded-full p-2 shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] transition-all`,
+                              children: (0, b.jsx)(t, { size: 20 }),
+                            }),
+                          ],
+                        }),
+                      }),
+                      (0, b.jsxs)(`div`, {
+                        className: `space-y-4`,
+                        children: [
+                          (0, b.jsxs)(`div`, {
+                            className: `flex flex-col gap-2`,
+                            children: [
+                              (0, b.jsxs)(`label`, {
+                                className: `font-black uppercase text-sm flex items-center gap-2`,
+                                children: [(0, b.jsx)(o, { size: 18 }), ` Nombre Completo`],
+                              }),
+                              (0, b.jsx)(`input`, {
+                                type: `text`,
+                                name: `displayName`,
+                                value: M.displayName,
+                                onChange: P,
+                                className: `w-full bg-yellow-100 border-4 border-black p-3 font-bold focus:outline-none focus:bg-yellow-200 focus:shadow-[4px_4px_0_0_#000] transition-all`,
+                                placeholder: `Tu nombre...`,
+                              }),
+                            ],
+                          }),
+                          (0, b.jsxs)(`div`, {
+                            className: `grid grid-cols-1 md:grid-cols-2 gap-4`,
+                            children: [
+                              (0, b.jsxs)(`div`, {
+                                className: `flex flex-col gap-2`,
+                                children: [
+                                  (0, b.jsxs)(`label`, {
+                                    className: `font-black uppercase text-sm flex items-center gap-2`,
+                                    children: [(0, b.jsx)(l, { size: 18 }), ` Cargo / Puesto`],
+                                  }),
+                                  (0, b.jsx)(`input`, {
+                                    type: `text`,
+                                    name: `jobTitle`,
+                                    value: M.jobTitle,
+                                    onChange: P,
+                                    className: `w-full bg-white border-4 border-black p-3 font-bold focus:outline-none focus:bg-cyan-100 focus:shadow-[4px_4px_0_0_#000] transition-all`,
+                                    placeholder: `Ej. Diseñador`,
+                                  }),
+                                ],
+                              }),
+                              (0, b.jsxs)(`div`, {
+                                className: `flex flex-col gap-2`,
+                                children: [
+                                  (0, b.jsxs)(`label`, {
+                                    className: `font-black uppercase text-sm flex items-center gap-2`,
+                                    children: [(0, b.jsx)(c, { size: 18 }), ` Sector`],
+                                  }),
+                                  (0, b.jsxs)(`select`, {
+                                    name: `sector`,
+                                    value: M.sector,
+                                    onChange: P,
+                                    className: `w-full bg-white border-4 border-black p-3 font-bold focus:outline-none focus:bg-cyan-100 focus:shadow-[4px_4px_0_0_#000] transition-all appearance-none cursor-pointer`,
+                                    children: [
+                                      (0, b.jsx)(`option`, {
+                                        value: ``,
+                                        children: `Seleccionar...`,
+                                      }),
+                                      (0, b.jsx)(`option`, {
+                                        value: `Tecnología`,
+                                        children: `Tecnología`,
+                                      }),
+                                      (0, b.jsx)(`option`, {
+                                        value: `Recursos Humanos`,
+                                        children: `Recursos Humanos`,
+                                      }),
+                                      (0, b.jsx)(`option`, {
+                                        value: `Operaciones`,
+                                        children: `Operaciones`,
+                                      }),
+                                      (0, b.jsx)(`option`, { value: `Ventas`, children: `Ventas` }),
+                                      (0, b.jsx)(`option`, {
+                                        value: `Transporte`,
+                                        children: `Transporte`,
+                                      }),
+                                      (0, b.jsx)(`option`, { value: `Otro`, children: `Otro` }),
+                                    ],
+                                  }),
+                                ],
+                              }),
+                            ],
+                          }),
+                          (0, b.jsxs)(`div`, {
+                            className: `flex flex-col gap-2`,
+                            children: [
+                              (0, b.jsxs)(`label`, {
+                                className: `font-black uppercase text-sm flex items-center gap-2`,
+                                children: [(0, b.jsx)(r, { size: 18 }), ` ID de Empleado`],
+                              }),
+                              (0, b.jsx)(`input`, {
+                                type: `text`,
+                                name: `employeeId`,
+                                value: M.employeeId,
+                                onChange: P,
+                                className: `w-full bg-white border-4 border-black p-3 font-bold focus:outline-none focus:bg-cyan-100 focus:shadow-[4px_4px_0_0_#000] transition-all`,
+                                placeholder: `Ej. EMP-001`,
+                              }),
+                            ],
+                          }),
+                          (0, b.jsxs)(`div`, {
+                            className: `flex flex-col gap-2`,
+                            children: [
+                              (0, b.jsxs)(`label`, {
+                                className: `font-black uppercase text-sm flex items-center gap-2`,
+                                children: [(0, b.jsx)(s, { size: 18 }), ` Telefono`],
+                              }),
+                              (0, b.jsx)(`input`, {
+                                type: `tel`,
+                                name: `phoneNumber`,
+                                value: M.phoneNumber,
+                                onChange: P,
+                                className: `w-full bg-white border-4 border-black p-3 font-bold focus:outline-none focus:bg-cyan-100 focus:shadow-[4px_4px_0_0_#000] transition-all`,
+                                placeholder: `Ej. +34 600 000 000`,
+                              }),
+                            ],
+                          }),
+                        ],
+                      }),
+                      (0, b.jsx)(`button`, {
+                        type: `submit`,
+                        disabled: w,
+                        className: `mt-4 bg-red-500 hover:bg-red-400 disabled:bg-gray-400 text-white font-black uppercase text-xl py-4 border-4 border-black shadow-[6px_6px_0_0_#000] hover:translate-x-1 hover:translate-y-1 hover:shadow-[2px_2px_0_0_#000] transition-all flex items-center justify-center gap-3 cursor-pointer`,
+                        children: w
+                          ? `Guardando...`
+                          : (0, b.jsxs)(b.Fragment, {
+                              children: [(0, b.jsx)(n, { size: 24 }), ` Guardar Perfil`],
+                            }),
+                      }),
+                    ],
+                  }),
+                ],
+              }),
+            ],
+          }),
+        }),
+      ],
+    });
+  };
+export { S as default };
