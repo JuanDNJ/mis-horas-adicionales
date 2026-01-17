@@ -131,7 +131,6 @@ const Dashboard = () => {
         origen: "",
         destino: "",
         total_horas: "",
-        ramo: "",
       });
       setIsFormOpen(false);
     } catch (err) {
@@ -196,7 +195,6 @@ const Dashboard = () => {
         origen: "",
         destino: "",
         total_horas: "",
-        ramo: "",
       });
       setEditingIndex(null);
       setIsFormOpen(true);

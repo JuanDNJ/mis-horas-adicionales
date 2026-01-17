@@ -1,9 +1,75 @@
-import { ChevronLeft } from "lucide-react";
-import { DayPicker } from "react-day-picker";
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { DayPicker, useDayPicker } from "react-day-picker";
 import { cn } from "@/lib/utils";
 import { es } from "date-fns/locale";
+import type { MonthCaptionProps } from "react-day-picker";
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>;
+
+const buttonBaseClasses =
+  "h-8 w-8 bg-transparent p-0 flex items-center justify-center border-2 border-black transition-all hover:bg-black hover:text-white text-theme-color";
+
+const CustomMonthCaption = ({ calendarMonth }: MonthCaptionProps) => {
+  const { goToMonth, nextMonth, previousMonth } = useDayPicker();
+  const displayMonth = calendarMonth.date;
+
+  const handleYearChange = (offset: number) => {
+    const newDate = new Date(displayMonth);
+    newDate.setFullYear(newDate.getFullYear() + offset);
+    // Simplified checks for v9 as nextMonth/previousMonth are handled by hook
+    goToMonth(newDate);
+  };
+
+  const handleMonthChange = (offset: number) => {
+    if (offset < 0 && previousMonth) goToMonth(previousMonth);
+    if (offset > 0 && nextMonth) goToMonth(nextMonth);
+  };
+
+  return (
+    <div className="flex flex-col items-center justify-center gap-2 mb-4 relative w-full pt-2">
+      <div className="text-xl font-black tracking-wider text-theme-color uppercase">
+        {displayMonth.toLocaleDateString("es", { month: "long", year: "numeric" })}
+      </div>
+
+      <div className="flex items-center gap-1">
+        <button
+          type="button"
+          onClick={() => handleYearChange(-1)}
+          className={cn(buttonBaseClasses, "disabled:opacity-40 disabled:cursor-not-allowed")}
+          aria-label="Año anterior"
+        >
+          <ChevronsLeft className="h-4 w-4" />
+        </button>
+        <button
+          type="button"
+          onClick={() => handleMonthChange(-1)}
+          className={cn(buttonBaseClasses, "disabled:opacity-40 disabled:cursor-not-allowed")}
+          aria-label="Mes anterior"
+          disabled={!previousMonth}
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </button>
+        <button
+          type="button"
+          onClick={() => handleMonthChange(1)}
+          className={cn(buttonBaseClasses, "disabled:opacity-40 disabled:cursor-not-allowed")}
+          aria-label="Mes siguiente"
+          disabled={!nextMonth}
+        >
+          <ChevronRight className="h-4 w-4" />
+        </button>
+        <button
+          type="button"
+          onClick={() => handleYearChange(1)}
+          className={cn(buttonBaseClasses, "disabled:opacity-40 disabled:cursor-not-allowed")}
+          aria-label="Año siguiente"
+        >
+          <ChevronsRight className="h-4 w-4" />
+        </button>
+      </div>
+    </div>
+  );
+};
 
 export const Calendar = ({
   className,
@@ -22,36 +88,30 @@ export const Calendar = ({
       classNames={{
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0 text-theme-color",
         month: "space-y-4",
-        caption: "flex justify-center pt-1 relative items-center mb-2",
-        caption_label: "text-lg font-black uppercase tracking-wider",
-        nav: "space-x-1 flex items-center",
-        nav_button: cn(
-          "h-7 w-7 bg-transparent p-0 flex items-center justify-center border-2 border-transparent hover:border-black transition-all hover:bg-black hover:text-white"
-        ),
-        nav_button_previous: "absolute left-1",
-        nav_button_next: "absolute right-1",
-        table: "w-full border-collapse space-y-1",
-        head_row: "flex",
-        head_cell: "text-secondary rounded-md w-9 font-normal text-[0.8rem] uppercase",
-        row: "flex w-full mt-2",
-        cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
+        caption_label: "hidden",
+        nav: "hidden", // Hide default nav
+        month_grid: "w-full border-collapse space-y-1",
+        weekdays: "flex",
+        weekday: "text-secondary rounded-md w-9 font-normal text-[0.8rem] uppercase",
+        week: "flex w-full mt-2",
         day: cn(
-          "h-9 w-9 p-0 font-bold aria-selected:opacity-100 hover:bg-black hover:text-white border-2 border-transparent transition-all"
+          "h-9 w-9 p-0 font-bold aria-selected:opacity-100 hover:bg-black hover:text-white border-2 border-transparent transition-all flex items-center justify-center"
         ),
-        day_range_end: "day-range-end",
-        day_selected:
+        range_end: "day-range-end",
+        selected:
           "bg-theme-accent text-white hover:bg-theme-accent hover:text-white focus:bg-theme-accent focus:text-white border-2 border-black",
-        day_today:
+        today:
           "bg-theme-secondary/20 text-theme-color border-2 border-theme-secondary text-accent-foreground",
-        day_outside:
+        outside:
           "day-outside text-muted-foreground opacity-50 aria-selected:bg-accent/50 aria-selected:text-muted-foreground aria-selected:opacity-30",
-        day_disabled: "text-muted-foreground opacity-50",
-        day_range_middle: "aria-selected:bg-accent aria-selected:text-accent-foreground",
-        day_hidden: "invisible",
+        disabled: "text-muted-foreground opacity-50",
+        range_middle: "aria-selected:bg-accent aria-selected:text-accent-foreground",
+        hidden: "invisible",
         ...classNames,
       }}
       components={{
-        Chevron: (props) => <ChevronLeft {...props} className={cn("h-4 w-4", props.className)} />,
+        MonthCaption: CustomMonthCaption,
+        Nav: () => <></>, // Hide default navigation
       }}
       {...props}
     />
