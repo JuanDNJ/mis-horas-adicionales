@@ -1,12 +1,12 @@
 import { type Theme } from "@/config";
 
-interface GlobalContextType {
+export interface GlobalContextType {
   appTitle: string;
   setAppTitle: (title: string) => void;
   selectedTheme: Theme;
   setSelectedTheme: (theme: Theme) => void;
 }
-interface UserContextType {
+export interface UserContextType {
   // Define user-related context properties here
   displayName: string;
   photoURL: string;
@@ -20,7 +20,7 @@ interface UserContextType {
   updateUserProfile?: (name: string, photo: string, phoneNumber: string, email: string) => void;
 }
 
-interface JobProfile {
+export interface JobProfile {
   id: string;
   companyName: string; // Nombre de la empresa -> para el campo 'empresa'
   jobTitle: string;
@@ -31,7 +31,7 @@ interface JobProfile {
   updatedAt?: Date;
 }
 
-interface UserProfile {
+export interface UserProfile {
   uid?: string;
   displayName: string;
   email: string;
@@ -44,7 +44,7 @@ interface UserProfile {
   updatedAt?: Date;
 }
 
-interface ProfileContextType {
+export interface ProfileContextType {
   userProfile: UserProfile | null;
   jobProfiles: JobProfile[]; // Lista de perfiles de trabajo
   activeJobProfile: JobProfile | null; // El perfil seleccionado actualmente
@@ -62,5 +62,3 @@ interface ProfileContextType {
 
   refreshProfile: () => Promise<void>;
 }
-
-export type { GlobalContextType, UserContextType, UserProfile, JobProfile, ProfileContextType };
