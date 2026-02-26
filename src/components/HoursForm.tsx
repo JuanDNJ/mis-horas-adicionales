@@ -51,7 +51,7 @@ const InputGroup = ({
 }) => (
   <div className={cn("flex flex-col gap-2 p-4 border-2 border-black bg-white/50", className)}>
     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b-2 border-black pb-1 mb-2 gap-2">
-      <h3 className="text-lg font-black uppercase italic text-theme-color">{label}</h3>
+      <h3 className="text-sm md:text-lg font-black uppercase italic text-theme-color">{label}</h3>
       {headerActions && <div className="flex items-center">{headerActions}</div>}
     </div>
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">{children}</div>
@@ -70,7 +70,7 @@ const Input = ({ label, className, containerClassName, ...props }: InputProps) =
     </label>
     <input
       className={cn(
-        "w-full px-3 py-2 bg-theme-bg border-2 border-black text-theme-color focus:outline-none focus:shadow-[4px_4px_0px_0px_var(--theme-accent)] focus:border-theme-accent transition-all duration-200 placeholder:text-secondary/40 font-bold",
+        "w-fulltext-xs px-3 py-2 bg-theme-bg border-2 border-black text-theme-color focus:outline-none focus:shadow-[4px_4px_0px_0px_var(--theme-accent)] focus:border-theme-accent transition-all duration-200 placeholder:text-secondary/40 font-bold",
         className
       )}
       autoComplete="off"
@@ -86,30 +86,32 @@ const SectorNavigation = ({
   selectedSector: "general" | "transport";
   onSectorChange: (sector: "general" | "transport") => void;
 }) => (
-  <nav className="flex items-center gap-4 bg-white/50 px-3 py-1 rounded-sm border border-black/20">
+  <nav className="w-full flex items-center gap-4 bg-white/50 px-3 py-1 rounded-sm border border-black/20">
     <span className="text-xs font-bold uppercase text-secondary mr-2">Sector:</span>
-    <label className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
-      <input
-        type="radio"
-        name="sector_type"
-        value="general"
-        checked={selectedSector === "general"}
-        onChange={() => onSectorChange("general")}
-        className="accent-theme-color w-4 h-4 cursor-pointer"
-      />
-      <span className="text-sm font-bold text-theme-color select-none">General</span>
-    </label>
-    <label className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
-      <input
-        type="radio"
-        name="sector_type"
-        value="transport"
-        checked={selectedSector === "transport"}
-        onChange={() => onSectorChange("transport")}
-        className="accent-theme-color w-4 h-4 cursor-pointer"
-      />
-      <span className="text-sm font-bold text-theme-color select-none">Transporte</span>
-    </label>
+    <div className="flex flex-col sm:flex-row gap-2">
+      <label className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
+        <input
+          type="radio"
+          name="sector_type"
+          value="general"
+          checked={selectedSector === "general"}
+          onChange={() => onSectorChange("general")}
+          className="accent-theme-color w-4 h-4 cursor-pointer"
+        />
+        <span className="text-sm font-bold text-theme-color select-none">General</span>
+      </label>
+      <label className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
+        <input
+          type="radio"
+          name="sector_type"
+          value="transport"
+          checked={selectedSector === "transport"}
+          onChange={() => onSectorChange("transport")}
+          className="accent-theme-color w-4 h-4 cursor-pointer"
+        />
+        <span className="text-sm font-bold text-theme-color select-none">Transporte</span>
+      </label>
+    </div>
   </nav>
 );
 
@@ -261,7 +263,7 @@ export const HoursForm = ({ formData, onChange, setFormData }: HoursFormProps) =
                 <select
                   value={selectedJobId || ""}
                   onChange={handleJobSelect}
-                  className="w-full px-3 py-2 bg-theme-bg border-2 border-black text-theme-color focus:outline-none focus:shadow-[4px_4px_0px_0px_var(--theme-accent)] focus:border-theme-accent transition-all duration-200 font-bold appearance-none cursor-pointer"
+                  className="text-sm w-full px-3 py-2 bg-theme-bg border-2 border-black text-theme-color focus:outline-none focus:shadow-[4px_4px_0px_0px_var(--theme-accent)] focus:border-theme-accent transition-all duration-200 font-bold appearance-none cursor-pointer"
                 >
                   <option value="" disabled>
                     Selecciona una empresa

@@ -299,6 +299,7 @@ const CreateProfile: FC = () => {
                         accept="image/*"
                         onChange={handlePhotoChange}
                         className="hidden"
+                        aria-label="Subir foto de perfil"
                       />
                     </div>
                   </div>
@@ -383,6 +384,8 @@ const CreateProfile: FC = () => {
                           onChange={(e) => setJobData({ ...jobData, companyName: e.target.value })}
                           className="w-full border-2 border-black p-2 font-bold"
                           placeholder="Nombre de la empresa"
+                          title="Nombre de la empresa"
+                          aria-label="Nombre de la empresa"
                         />
                       </div>
                       <div>
@@ -393,6 +396,8 @@ const CreateProfile: FC = () => {
                           onChange={(e) => setJobData({ ...jobData, jobTitle: e.target.value })}
                           className="w-full border-2 border-black p-2 font-bold"
                           placeholder="Ej. Conductor, Admin..."
+                          title="Cargo o puesto de trabajo"
+                          aria-label="Cargo o puesto de trabajo"
                         />
                       </div>
                     </div>
@@ -406,11 +411,15 @@ const CreateProfile: FC = () => {
                           onChange={(e) => setJobData({ ...jobData, employeeId: e.target.value })}
                           className="w-full border-2 border-black p-2 font-bold"
                           placeholder="ID numérico o alfa"
+                          title="Número o identificador de empleado"
                         />
                       </div>
                       <div>
-                        <label className="font-bold text-sm mb-1 block">Sector</label>
+                        <label htmlFor="sector-select" className="font-bold text-sm mb-1 block">
+                          Sector
+                        </label>
                         <select
+                          id="sector-select"
                           value={jobData.sector}
                           onChange={(e) =>
                             setJobData({
@@ -419,6 +428,7 @@ const CreateProfile: FC = () => {
                             })
                           }
                           className="w-full border-2 border-black p-2 font-bold cursor-pointer"
+                          title="Selecciona el sector de trabajo"
                         >
                           <option value="General">General</option>
                           <option value="Transporte">Transporte</option>

@@ -258,7 +258,9 @@ const Dashboard = () => {
                   {/* Close Button for Mobile Modal */}
                   <div className="w-full flex justify-end xl:hidden sticky top-0 z-10 mb-2">
                     <button
+                      type="button"
                       onClick={() => setIsFormOpen(false)}
+                      title="Cerrar formulario"
                       className="bg-red-500 text-white p-2 border-2 border-black shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] active:translate-y-0.5 active:shadow-none transition-all"
                     >
                       <FaTimes size={24} />
