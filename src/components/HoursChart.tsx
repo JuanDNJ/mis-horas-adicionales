@@ -30,11 +30,13 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
 };
 
 export const HoursChart: FC<HoursChartProps> = ({ data, className }) => {
+  if (!data || data.length === 0) return null;
+
   return (
-    <div className={cn("w-full h-48 sm:h-64", className)}>
+    <div className={cn("w-full min-h-50", className)}>
       {/* Contenedor con estilo comic */}
-      <div className="w-full h-full bg-white border-4 border-black p-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rounded-lg box-border">
-        <ResponsiveContainer width="100%" height="100%">
+      <div className="bg-white border-4 border-black p-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rounded-lg box-border w-full h-full">
+        <ResponsiveContainer width="100%" height={200}>
           <BarChart
             data={data}
             margin={{

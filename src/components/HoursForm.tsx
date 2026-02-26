@@ -49,12 +49,16 @@ const InputGroup = ({
   className?: string;
   headerActions?: ReactNode;
 }) => (
-  <div className={cn("flex flex-col gap-2 p-4 border-2 border-black bg-white/50", className)}>
-    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b-2 border-black pb-1 mb-2 gap-2">
-      <h3 className="text-sm md:text-lg font-black uppercase italic text-theme-color">{label}</h3>
-      {headerActions && <div className="flex items-center">{headerActions}</div>}
+  <div
+    className={cn("flex flex-col gap-3 p-3 sm:p-4 border-2 border-black bg-white/50", className)}
+  >
+    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b-2 border-black pb-2 mb-1 gap-2">
+      <h3 className="text-sm sm:text-base md:text-lg font-black uppercase italic text-theme-color">
+        {label}
+      </h3>
+      {headerActions && <div className="flex items-center w-full sm:w-auto">{headerActions}</div>}
     </div>
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">{children}</div>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4"> {children}</div>
   </div>
 );
 
@@ -70,7 +74,7 @@ const Input = ({ label, className, containerClassName, ...props }: InputProps) =
     </label>
     <input
       className={cn(
-        "w-fulltext-xs px-3 py-2 bg-theme-bg border-2 border-black text-theme-color focus:outline-none focus:shadow-[4px_4px_0px_0px_var(--theme-accent)] focus:border-theme-accent transition-all duration-200 placeholder:text-secondary/40 font-bold",
+        "w-full text-xs px-3 py-2 bg-theme-bg border-2 border-black text-theme-color focus:outline-none focus:shadow-[4px_4px_0px_0px_var(--theme-accent)] focus:border-theme-accent transition-all duration-200 placeholder:text-secondary/40 font-bold",
         className
       )}
       autoComplete="off"
@@ -96,7 +100,7 @@ const SectorNavigation = ({
           value="general"
           checked={selectedSector === "general"}
           onChange={() => onSectorChange("general")}
-          className="accent-theme-color w-4 h-4 cursor-pointer"
+          className="text-sm accent-theme-color w-4 h-4 cursor-pointer"
         />
         <span className="text-sm font-bold text-theme-color select-none">General</span>
       </label>
@@ -107,7 +111,7 @@ const SectorNavigation = ({
           value="transport"
           checked={selectedSector === "transport"}
           onChange={() => onSectorChange("transport")}
-          className="accent-theme-color w-4 h-4 cursor-pointer"
+          className="text-sm accent-theme-color w-4 h-4 cursor-pointer"
         />
         <span className="text-sm font-bold text-theme-color select-none">Transporte</span>
       </label>
@@ -241,21 +245,21 @@ export const HoursForm = ({ formData, onChange, setFormData }: HoursFormProps) =
       : "Selecciona una fecha";
 
   return (
-    <div className="w-full max-w-2xl mx-auto p-4 md:p-6 bg-header-bg border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] space-y-4">
-      <div className="text-center mb-8 border-b-4 border-black pb-4">
-        <h2 className="text-3xl font-black uppercase text-theme-color drop-shadow-sm">
+    <div className="w-full max-w-2xl mx-auto p-3 sm:p-4 md:p-6 bg-header-bg border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] space-y-4">
+      <div className="text-center mb-6 sm:mb-8 border-b-4 border-black pb-4">
+        <h2 className="text-2xl sm:text-3xl font-black uppercase text-theme-color drop-shadow-sm">
           Registro de Horas
         </h2>
-        <p className="text-secondary font-bold font-mono text-sm mt-2">
+        <p className="text-secondary font-bold font-mono text-xs sm:text-sm mt-2">
           Rellena todos los campos requeridos
         </p>
       </div>
 
-      <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+      <form className="space-y-5 sm:space-y-6" onSubmit={(e) => e.preventDefault()}>
         {/* Datos Personales */}
         <InputGroup label="Información Personal">
           {jobProfiles.length > 0 ? (
-            <div className="col-span-1 md:col-span-2 lg:col-span-3 flex flex-col gap-1">
+            <div className="col-span-1 sm:col-span-2 lg:col-span-3 flex flex-col gap-1">
               <label className="text-xs font-bold text-secondary uppercase tracking-wider ml-1">
                 Empresa / Perfil
               </label>
@@ -263,6 +267,9 @@ export const HoursForm = ({ formData, onChange, setFormData }: HoursFormProps) =
                 <select
                   value={selectedJobId || ""}
                   onChange={handleJobSelect}
+                  name="empresa"
+                  id="empresa"
+                  title="Selecciona tu empresa y perfil laboral"
                   className="text-sm w-full px-3 py-2 bg-theme-bg border-2 border-black text-theme-color focus:outline-none focus:shadow-[4px_4px_0px_0px_var(--theme-accent)] focus:border-theme-accent transition-all duration-200 font-bold appearance-none cursor-pointer"
                 >
                   <option value="" disabled>
@@ -298,6 +305,7 @@ export const HoursForm = ({ formData, onChange, setFormData }: HoursFormProps) =
             value={formData.numero_empleado}
             onChange={onChange}
             placeholder="000000"
+            containerClassName="sm:col-span-1"
           />
           <Input
             label="Nombre"
@@ -305,6 +313,7 @@ export const HoursForm = ({ formData, onChange, setFormData }: HoursFormProps) =
             value={formData.nombre}
             onChange={onChange}
             placeholder="Tu nombre"
+            containerClassName="sm:col-span-1"
           />
           <Input
             label="Apellido Paterno"
@@ -312,6 +321,7 @@ export const HoursForm = ({ formData, onChange, setFormData }: HoursFormProps) =
             value={formData.apellido_paterno}
             onChange={onChange}
             placeholder="Apellido Paterno"
+            containerClassName="sm:col-span-1"
           />
           <Input
             label="Apellido Materno"
@@ -319,6 +329,7 @@ export const HoursForm = ({ formData, onChange, setFormData }: HoursFormProps) =
             value={formData.apellido_materno}
             onChange={onChange}
             placeholder="Apellido Materno"
+            containerClassName="sm:col-span-1"
           />
           <Input
             label="Teléfono"
@@ -327,12 +338,13 @@ export const HoursForm = ({ formData, onChange, setFormData }: HoursFormProps) =
             onChange={onChange}
             placeholder="555-555-5555"
             type="tel"
+            containerClassName="sm:col-span-1"
           />
         </InputGroup>
 
         {/* Fecha */}
         <InputGroup label="Fecha del Registro" className="relative z-10">
-          <div className="col-span-1 md:col-span-2 lg:col-span-3">
+          <div className="col-span-1 sm:col-span-2 lg:col-span-3">
             <label className="text-xs font-bold text-secondary uppercase tracking-wider ml-1 mb-1 block">
               Seleccionar Fecha
             </label>
@@ -348,19 +360,14 @@ export const HoursForm = ({ formData, onChange, setFormData }: HoursFormProps) =
                       : ""
                   )}
                 >
-                  <span className={!formData.dia ? "text-secondary/60" : ""}>
+                  <small className={!formData.dia ? "text-sm text-secondary/60" : "text-sm"}>
                     {formattedDateDisplay}
-                  </span>
-                  <FaCalendarAlt className="text-secondary" />
+                  </small>
+                  <FaCalendarAlt className="text-secondary text-sm" />
                 </div>
               }
               content={
-                <Calendar
-                  mode="single"
-                  selected={getSelectedDate()}
-                  onSelect={handleDateSelect}
-                  initialFocus
-                />
+                <Calendar mode="single" selected={getSelectedDate()} onSelect={handleDateSelect} />
               }
             />
           </div>

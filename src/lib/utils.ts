@@ -1,6 +1,28 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
+export function jvcQuery(selector: string): HTMLElement | null {
+  try {
+    return document.querySelector(selector) as HTMLElement;
+  } catch (error) {
+    console.error(`Error querying selector "${selector}":`, error);
+    return null;
+  }
+}
+
+export function jvcQueryAll(selector: string): HTMLElement[] {
+  try {
+    return Array.from(document.querySelectorAll(selector)) as HTMLElement[];
+  } catch (error) {
+    console.error(`Error querying selector "${selector}":`, error);
+    return [];
+  }
+}
+
+export function rootElement(): HTMLElement | null {
+  return jvcQuery("#root");
+}
+
 /**
  * Utility function to merge Tailwind CSS classes safely.
  * It combines the power of clsx (conditional classes) and tailwind-merge (resolving conflicts).

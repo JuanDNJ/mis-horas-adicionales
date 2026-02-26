@@ -1,6 +1,7 @@
 import { lazy } from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import RecordNewHours from "@/pages/RecordNewHours";
 
 const App = lazy(() => import("@/App"));
 const Profile = lazy(() => import("@/pages/Profile"));
@@ -19,6 +20,10 @@ const router = createBrowserRouter([
       {
         path: "/dashboard",
         element: <Dashboard />,
+      },
+      {
+        path: "/record",
+        element: <RecordNewHours />,
       },
       {
         path: "/record/:id",

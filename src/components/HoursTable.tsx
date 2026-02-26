@@ -136,21 +136,27 @@ export const HoursTable = ({
             <div className="absolute top-2 right-2 flex gap-2">
               {item.id && (
                 <button
+                  type="button"
                   onClick={() => navigate(`/record/${item.id}`)}
                   className="p-2 bg-action-create hover:brightness-110 border-2 border-black text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
+                  title="Ver detalle"
                 >
                   <FaEye size={14} />
                 </button>
               )}
               <button
+                type="button"
                 onClick={() => onEdit(item)}
                 className="p-2 bg-action-edit hover:brightness-110 border-2 border-black text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
+                title="Editar registro"
               >
                 <FaPen size={14} />
               </button>
               <button
+                type="button"
                 onClick={() => onDelete(item)}
                 className="p-2 bg-action-delete hover:brightness-110 border-2 border-black text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
+                title="Eliminar registro"
               >
                 <FaTrash size={16} />
               </button>

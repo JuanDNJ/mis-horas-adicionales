@@ -4,7 +4,7 @@ import ContentSection from "@/components/ContentSection";
 import { themes } from "@/config";
 import { useGlobalContext } from "@/hooks/useGlobalContext";
 import { FaAdversal, FaAmilia, FaSatellite } from "react-icons/fa";
-import Main from "./components/Main";
+import MainContent from "./pages/layouts/Main";
 
 const App = () => {
   const { setSelectedTheme } = useGlobalContext();
@@ -30,7 +30,7 @@ const App = () => {
       <Header />
       {/* Hero Section: Main introduction and value proposition */}
       <Hero />
-      <Main>
+      <MainContent>
         {/* Transparencia Total: Information about pricing and free features for early adopters */}
         <ContentSection
           title="Transparencia Total"
@@ -156,7 +156,7 @@ const App = () => {
             </a>
           </p>
         </ContentSection>
-      </Main>
+      </MainContent>
     </>
   );
 };

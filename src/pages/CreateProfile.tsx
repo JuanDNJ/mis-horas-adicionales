@@ -1,11 +1,10 @@
-import Header from "@/components/Header";
-import Main from "@/components/Main";
 import { type FC, useState, useEffect, useRef } from "react";
 import { Save, User, Briefcase, Hash, Camera, Plus, Trash2, Edit, Check, Star } from "lucide-react";
 import { useProfileContext } from "@/hooks/useProfileContext";
 import { storage, auth } from "@/lib/firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import type { JobProfile } from "@/context/types/index";
+import IndexLayout from "./layouts/index.layout";
 
 // Función para comprimir y redimensionar imagen (Mantenida igual)
 const compressImage = (file: File): Promise<File> => {
@@ -250,301 +249,294 @@ const CreateProfile: FC = () => {
   };
 
   return (
-    <>
-      <Header />
-      <Main>
-        <div className="w-full max-w-4xl mx-auto p-4 md:p-6 font-mono pb-20">
-          <div className="mb-8 text-center relative">
-            <h1 className="text-4xl md:text-5xl font-black uppercase italic tracking-tighter text-black drop-shadow-[3px_3px_0_rgba(255,255,255,1)]">
-              Mi Perfil
-            </h1>
+    <IndexLayout>
+      <div className="w-full max-w-4xl mx-auto p-4 md:p-6 font-mono pb-20">
+        <div className="mb-8 text-center relative">
+          <h1 className="text-4xl md:text-5xl font-black uppercase italic tracking-tighter text-black drop-shadow-[3px_3px_0_rgba(255,255,255,1)]">
+            Mi Perfil
+          </h1>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+          {/* Lado Izquierdo: Datos Personales */}
+          <div className="lg:col-span-1">
+            <div className="relative">
+              <div className="absolute inset-0 bg-black translate-x-2 translate-y-2 rounded-xl"></div>
+              <div className="relative bg-white border-4 border-black p-6 rounded-xl flex flex-col gap-6">
+                {/* Foto */}
+                <div className="flex justify-center">
+                  <div className="relative group">
+                    <div className="w-32 h-32 bg-slate-200 border-4 border-black rounded-full overflow-hidden relative cursor-pointer">
+                      {uploadingPhoto ? (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/50 text-white font-bold text-xs">
+                          Subiendo...
+                        </div>
+                      ) : photoURL ? (
+                        <img src={photoURL} alt="Profile" className="w-full h-full object-cover" />
+                      ) : (
+                        <User
+                          size={64}
+                          className="text-slate-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+                        />
+                      )}
+                      <div
+                        className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        <Camera className="text-white" size={32} />
+                      </div>
+                    </div>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handlePhotoChange}
+                      className="hidden"
+                      aria-label="Subir foto de perfil"
+                    />
+                  </div>
+                </div>
+
+                <form onSubmit={savePersonalData} className="flex flex-col gap-4">
+                  <div>
+                    <label className="font-black uppercase text-xs mb-1 block">
+                      Nombre Completo
+                    </label>
+                    <input
+                      type="text"
+                      name="displayName"
+                      value={personalData.displayName}
+                      onChange={handlePersonalChange}
+                      className="w-full bg-yellow-100 border-2 border-black p-2 font-bold focus:outline-none focus:shadow-[2px_2px_0_0_#000]"
+                      placeholder="Tu nombre..."
+                    />
+                  </div>
+                  <div>
+                    <label className="font-black uppercase text-xs mb-1 block">Teléfono</label>
+                    <input
+                      type="tel"
+                      name="phoneNumber"
+                      value={personalData.phoneNumber}
+                      onChange={handlePersonalChange}
+                      className="w-full bg-white border-2 border-black p-2 font-bold focus:outline-none focus:shadow-[2px_2px_0_0_#000]"
+                      placeholder="+34..."
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className="bg-cyan-400 text-black font-bold py-2 border-2 border-black shadow-[3px_3px_0_0_#000] hover:translate-y-0.5 hover:shadow-[1px_1px_0_0_#000] active:translate-y-1 active:shadow-none transition-all flex justify-center items-center gap-2"
+                  >
+                    <Save size={16} /> Guardar Personal
+                  </button>
+                </form>
+              </div>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-            {/* Lado Izquierdo: Datos Personales */}
-            <div className="lg:col-span-1">
-              <div className="relative">
-                <div className="absolute inset-0 bg-black translate-x-2 translate-y-2 rounded-xl"></div>
-                <div className="relative bg-white border-4 border-black p-6 rounded-xl flex flex-col gap-6">
-                  {/* Foto */}
-                  <div className="flex justify-center">
-                    <div className="relative group">
-                      <div className="w-32 h-32 bg-slate-200 border-4 border-black rounded-full overflow-hidden relative cursor-pointer">
-                        {uploadingPhoto ? (
-                          <div className="absolute inset-0 flex items-center justify-center bg-black/50 text-white font-bold text-xs">
-                            Subiendo...
-                          </div>
-                        ) : photoURL ? (
-                          <img
-                            src={photoURL}
-                            alt="Profile"
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <User
-                            size={64}
-                            className="text-slate-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-                          />
-                        )}
-                        <div
-                          className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={() => fileInputRef.current?.click()}
-                        >
-                          <Camera className="text-white" size={32} />
-                        </div>
-                      </div>
+          {/* Lado Derecho: Mis Empleos */}
+          <div className="lg:col-span-2">
+            <div className="flex justify-between items-end mb-4">
+              <h2 className="text-2xl font-black uppercase italic bg-yellow-300 px-2 border-2 border-black inline-block shadow-[3px_3px_0_0_#000]">
+                Mis Empleos
+              </h2>
+              {!isEditingJob && (
+                <button
+                  onClick={openNewJobForm}
+                  className="bg-green-500 text-white font-bold px-3 py-1 border-2 border-black shadow-[3px_3px_0_0_#000] hover:-translate-y-1 active:translate-y-0 transition-all flex items-center gap-1 text-sm"
+                >
+                  <Plus size={16} /> Añadir Empleo
+                </button>
+              )}
+            </div>
+
+            {isEditingJob ? (
+              // --- Formulario de Trabajo ---
+              <div className="relative animate-in fade-in slide-in-from-bottom-4">
+                <div className="absolute inset-0 bg-black translate-x-3 translate-y-3 rounded-xl"></div>
+                <form
+                  onSubmit={handleJobSubmit}
+                  className="relative bg-white border-4 border-black p-6 rounded-xl flex flex-col gap-4"
+                >
+                  <h3 className="font-black text-xl uppercase border-b-2 border-black pb-2 mb-2">
+                    {currentJobId ? "Editar Empleo" : "Nuevo Empleo"}
+                  </h3>
+
+                  {jobFormErrors && (
+                    <div className="bg-red-100 border-2 border-red-500 text-red-700 p-2 font-bold text-sm">
+                      {jobFormErrors}
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="font-bold text-sm mb-1 block">Empresa *</label>
                       <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/*"
-                        onChange={handlePhotoChange}
-                        className="hidden"
-                        aria-label="Subir foto de perfil"
+                        autoFocus
+                        type="text"
+                        value={jobData.companyName}
+                        onChange={(e) => setJobData({ ...jobData, companyName: e.target.value })}
+                        className="w-full border-2 border-black p-2 font-bold"
+                        placeholder="Nombre de la empresa"
+                        title="Nombre de la empresa"
+                        aria-label="Nombre de la empresa"
+                      />
+                    </div>
+                    <div>
+                      <label className="font-bold text-sm mb-1 block">Cargo / Puesto</label>
+                      <input
+                        type="text"
+                        value={jobData.jobTitle}
+                        onChange={(e) => setJobData({ ...jobData, jobTitle: e.target.value })}
+                        className="w-full border-2 border-black p-2 font-bold"
+                        placeholder="Ej. Conductor, Admin..."
+                        title="Cargo o puesto de trabajo"
+                        aria-label="Cargo o puesto de trabajo"
                       />
                     </div>
                   </div>
 
-                  <form onSubmit={savePersonalData} className="flex flex-col gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="font-black uppercase text-xs mb-1 block">
-                        Nombre Completo
-                      </label>
+                      <label className="font-bold text-sm mb-1 block">No. Empleado</label>
                       <input
                         type="text"
-                        name="displayName"
-                        value={personalData.displayName}
-                        onChange={handlePersonalChange}
-                        className="w-full bg-yellow-100 border-2 border-black p-2 font-bold focus:outline-none focus:shadow-[2px_2px_0_0_#000]"
-                        placeholder="Tu nombre..."
+                        value={jobData.employeeId}
+                        onChange={(e) => setJobData({ ...jobData, employeeId: e.target.value })}
+                        className="w-full border-2 border-black p-2 font-bold"
+                        placeholder="ID numérico o alfa"
+                        title="Número o identificador de empleado"
                       />
                     </div>
                     <div>
-                      <label className="font-black uppercase text-xs mb-1 block">Teléfono</label>
-                      <input
-                        type="tel"
-                        name="phoneNumber"
-                        value={personalData.phoneNumber}
-                        onChange={handlePersonalChange}
-                        className="w-full bg-white border-2 border-black p-2 font-bold focus:outline-none focus:shadow-[2px_2px_0_0_#000]"
-                        placeholder="+34..."
-                      />
+                      <label htmlFor="sector-select" className="font-bold text-sm mb-1 block">
+                        Sector
+                      </label>
+                      <select
+                        id="sector-select"
+                        value={jobData.sector}
+                        onChange={(e) =>
+                          setJobData({
+                            ...jobData,
+                            sector: e.target.value as "General" | "Transporte",
+                          })
+                        }
+                        className="w-full border-2 border-black p-2 font-bold cursor-pointer"
+                        title="Selecciona el sector de trabajo"
+                      >
+                        <option value="General">General</option>
+                        <option value="Transporte">Transporte</option>
+                      </select>
                     </div>
+                  </div>
+
+                  <div className="flex gap-4 mt-4">
                     <button
                       type="submit"
-                      className="bg-cyan-400 text-black font-bold py-2 border-2 border-black shadow-[3px_3px_0_0_#000] hover:translate-y-0.5 hover:shadow-[1px_1px_0_0_#000] active:translate-y-1 active:shadow-none transition-all flex justify-center items-center gap-2"
+                      className="flex-1 bg-black text-white font-bold py-3 hover:bg-gray-800 transition-colors"
                     >
-                      <Save size={16} /> Guardar Personal
+                      {currentJobId ? "Actualizar Empleo" : "Guardar Empleo"}
                     </button>
-                  </form>
-                </div>
+                    <button
+                      type="button"
+                      onClick={() => setIsEditingJob(false)}
+                      className="flex-1 bg-white border-2 border-black text-black font-bold py-3 hover:bg-gray-100 transition-colors"
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                </form>
               </div>
-            </div>
-
-            {/* Lado Derecho: Mis Empleos */}
-            <div className="lg:col-span-2">
-              <div className="flex justify-between items-end mb-4">
-                <h2 className="text-2xl font-black uppercase italic bg-yellow-300 px-2 border-2 border-black inline-block shadow-[3px_3px_0_0_#000]">
-                  Mis Empleos
-                </h2>
-                {!isEditingJob && (
-                  <button
-                    onClick={openNewJobForm}
-                    className="bg-green-500 text-white font-bold px-3 py-1 border-2 border-black shadow-[3px_3px_0_0_#000] hover:-translate-y-1 active:translate-y-0 transition-all flex items-center gap-1 text-sm"
-                  >
-                    <Plus size={16} /> Añadir Empleo
-                  </button>
-                )}
-              </div>
-
-              {isEditingJob ? (
-                // --- Formulario de Trabajo ---
-                <div className="relative animate-in fade-in slide-in-from-bottom-4">
-                  <div className="absolute inset-0 bg-black translate-x-3 translate-y-3 rounded-xl"></div>
-                  <form
-                    onSubmit={handleJobSubmit}
-                    className="relative bg-white border-4 border-black p-6 rounded-xl flex flex-col gap-4"
-                  >
-                    <h3 className="font-black text-xl uppercase border-b-2 border-black pb-2 mb-2">
-                      {currentJobId ? "Editar Empleo" : "Nuevo Empleo"}
-                    </h3>
-
-                    {jobFormErrors && (
-                      <div className="bg-red-100 border-2 border-red-500 text-red-700 p-2 font-bold text-sm">
-                        {jobFormErrors}
-                      </div>
-                    )}
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="font-bold text-sm mb-1 block">Empresa *</label>
-                        <input
-                          autoFocus
-                          type="text"
-                          value={jobData.companyName}
-                          onChange={(e) => setJobData({ ...jobData, companyName: e.target.value })}
-                          className="w-full border-2 border-black p-2 font-bold"
-                          placeholder="Nombre de la empresa"
-                          title="Nombre de la empresa"
-                          aria-label="Nombre de la empresa"
-                        />
-                      </div>
-                      <div>
-                        <label className="font-bold text-sm mb-1 block">Cargo / Puesto</label>
-                        <input
-                          type="text"
-                          value={jobData.jobTitle}
-                          onChange={(e) => setJobData({ ...jobData, jobTitle: e.target.value })}
-                          className="w-full border-2 border-black p-2 font-bold"
-                          placeholder="Ej. Conductor, Admin..."
-                          title="Cargo o puesto de trabajo"
-                          aria-label="Cargo o puesto de trabajo"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="font-bold text-sm mb-1 block">No. Empleado</label>
-                        <input
-                          type="text"
-                          value={jobData.employeeId}
-                          onChange={(e) => setJobData({ ...jobData, employeeId: e.target.value })}
-                          className="w-full border-2 border-black p-2 font-bold"
-                          placeholder="ID numérico o alfa"
-                          title="Número o identificador de empleado"
-                        />
-                      </div>
-                      <div>
-                        <label htmlFor="sector-select" className="font-bold text-sm mb-1 block">
-                          Sector
-                        </label>
-                        <select
-                          id="sector-select"
-                          value={jobData.sector}
-                          onChange={(e) =>
-                            setJobData({
-                              ...jobData,
-                              sector: e.target.value as "General" | "Transporte",
-                            })
-                          }
-                          className="w-full border-2 border-black p-2 font-bold cursor-pointer"
-                          title="Selecciona el sector de trabajo"
-                        >
-                          <option value="General">General</option>
-                          <option value="Transporte">Transporte</option>
-                        </select>
-                      </div>
-                    </div>
-
-                    <div className="flex gap-4 mt-4">
-                      <button
-                        type="submit"
-                        className="flex-1 bg-black text-white font-bold py-3 hover:bg-gray-800 transition-colors"
-                      >
-                        {currentJobId ? "Actualizar Empleo" : "Guardar Empleo"}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setIsEditingJob(false)}
-                        className="flex-1 bg-white border-2 border-black text-black font-bold py-3 hover:bg-gray-100 transition-colors"
-                      >
-                        Cancelar
-                      </button>
-                    </div>
-                  </form>
-                </div>
-              ) : (
-                // --- Lista de Trabajos ---
-                <div className="flex flex-col gap-4">
-                  {jobProfiles.length === 0 ? (
-                    <div className="bg-gray-100 border-2 border-dashed border-gray-400 p-8 text-center text-gray-500 rounded-lg">
-                      No tienes empleos registrados. ¡Añade uno para empezar a fichar!
-                    </div>
-                  ) : (
-                    jobProfiles.map((job) => (
+            ) : (
+              // --- Lista de Trabajos ---
+              <div className="flex flex-col gap-4">
+                {jobProfiles.length === 0 ? (
+                  <div className="bg-gray-100 border-2 border-dashed border-gray-400 p-8 text-center text-gray-500 rounded-lg">
+                    No tienes empleos registrados. ¡Añade uno para empezar a fichar!
+                  </div>
+                ) : (
+                  jobProfiles.map((job) => (
+                    <div
+                      key={job.id}
+                      className={`relative group transition-transform hover:-translate-y-1 duration-200 ${activeJobProfile?.id === job.id ? "z-10" : ""}`}
+                    >
+                      {/* Sombra */}
                       <div
-                        key={job.id}
-                        className={`relative group transition-transform hover:-translate-y-1 duration-200 ${activeJobProfile?.id === job.id ? "z-10" : ""}`}
+                        className={`absolute inset-0 translate-x-1 translate-y-1 rounded-lg border-2 border-black ${job.isDefault ? "bg-black" : "bg-gray-800"}`}
+                      ></div>
+
+                      {/* Tarjeta */}
+                      <div
+                        className={`relative border-2 border-black p-4 rounded-lg flex justify-between items-center ${activeJobProfile?.id === job.id ? "bg-yellow-100 ring-2 ring-yellow-400" : "bg-white"}`}
                       >
-                        {/* Sombra */}
-                        <div
-                          className={`absolute inset-0 translate-x-1 translate-y-1 rounded-lg border-2 border-black ${job.isDefault ? "bg-black" : "bg-gray-800"}`}
-                        ></div>
-
-                        {/* Tarjeta */}
-                        <div
-                          className={`relative border-2 border-black p-4 rounded-lg flex justify-between items-center ${activeJobProfile?.id === job.id ? "bg-yellow-100 ring-2 ring-yellow-400" : "bg-white"}`}
-                        >
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <h3 className="font-black text-lg uppercase">{job.companyName}</h3>
-                              {job.isDefault && (
-                                <span className="text-[10px] bg-black text-white px-1 py-0.5 rounded font-bold">
-                                  DEFAULT
-                                </span>
-                              )}
-                              {activeJobProfile?.id === job.id && (
-                                <span className="text-[10px] bg-green-500 text-white px-1 py-0.5 rounded font-bold flex items-center gap-1">
-                                  <Check size={8} /> ACTIVO
-                                </span>
-                              )}
-                            </div>
-                            <div className="text-sm font-bold text-gray-600 flex gap-4">
-                              <span className="flex items-center gap-1">
-                                <Briefcase size={14} /> {job.jobTitle || "Sin cargo"}
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-black text-lg uppercase">{job.companyName}</h3>
+                            {job.isDefault && (
+                              <span className="text-[10px] bg-black text-white px-1 py-0.5 rounded font-bold">
+                                DEFAULT
                               </span>
-                              <span className="flex items-center gap-1">
-                                <Hash size={14} /> {job.employeeId || "N/A"}
+                            )}
+                            {activeJobProfile?.id === job.id && (
+                              <span className="text-[10px] bg-green-500 text-white px-1 py-0.5 rounded font-bold flex items-center gap-1">
+                                <Check size={8} /> ACTIVO
                               </span>
-                            </div>
-                            <div className="mt-2 text-xs font-mono text-gray-500 hidden sm:block">
-                              Sector: {job.sector}
-                            </div>
+                            )}
                           </div>
-
-                          <div className="flex flex-col gap-2 pl-4 border-l-2 border-gray-200">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                openEditJobForm(job);
-                              }}
-                              className="p-1.5 hover:bg-gray-200 rounded text-blue-600 transition-colors"
-                              title="Editar"
-                            >
-                              <Edit size={18} />
-                            </button>
-
-                            {!job.isDefault && (
-                              <button
-                                onClick={(e) => handleDeleteJob(job.id, e)}
-                                className="p-1.5 hover:bg-red-100 rounded text-red-500 transition-colors"
-                                title="Eliminar"
-                              >
-                                <Trash2 size={18} />
-                              </button>
-                            )}
-
-                            {!job.isDefault && (
-                              <button
-                                onClick={(e) => handleSetDefault(job.id, e)}
-                                className="p-1.5 hover:bg-yellow-100 rounded text-yellow-600 border-2 border-transparent hover:border-yellow-200"
-                                title="Marcar como Principal"
-                              >
-                                <Star size={18} />
-                              </button>
-                            )}
+                          <div className="text-sm font-bold text-gray-600 flex gap-4">
+                            <span className="flex items-center gap-1">
+                              <Briefcase size={14} /> {job.jobTitle || "Sin cargo"}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Hash size={14} /> {job.employeeId || "N/A"}
+                            </span>
+                          </div>
+                          <div className="mt-2 text-xs font-mono text-gray-500 hidden sm:block">
+                            Sector: {job.sector}
                           </div>
                         </div>
+
+                        <div className="flex flex-col gap-2 pl-4 border-l-2 border-gray-200">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openEditJobForm(job);
+                            }}
+                            className="p-1.5 hover:bg-gray-200 rounded text-blue-600 transition-colors"
+                            title="Editar"
+                          >
+                            <Edit size={18} />
+                          </button>
+
+                          {!job.isDefault && (
+                            <button
+                              onClick={(e) => handleDeleteJob(job.id, e)}
+                              className="p-1.5 hover:bg-red-100 rounded text-red-500 transition-colors"
+                              title="Eliminar"
+                            >
+                              <Trash2 size={18} />
+                            </button>
+                          )}
+
+                          {!job.isDefault && (
+                            <button
+                              onClick={(e) => handleSetDefault(job.id, e)}
+                              className="p-1.5 hover:bg-yellow-100 rounded text-yellow-600 border-2 border-transparent hover:border-yellow-200"
+                              title="Marcar como Principal"
+                            >
+                              <Star size={18} />
+                            </button>
+                          )}
+                        </div>
                       </div>
-                    ))
-                  )}
-                </div>
-              )}
-            </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
           </div>
         </div>
-      </Main>
-    </>
+      </div>
+    </IndexLayout>
   );
 };
 
