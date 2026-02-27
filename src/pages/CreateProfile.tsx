@@ -252,8 +252,8 @@ const CreateProfile: FC = () => {
     <IndexLayout>
       <div className="w-full max-w-4xl mx-auto p-4 md:p-6 font-mono pb-20">
         <div className="mb-8 text-center relative">
-          <h1 className="text-4xl md:text-5xl font-black uppercase italic tracking-tighter text-black drop-shadow-[3px_3px_0_rgba(255,255,255,1)]">
-            Mi Perfil
+          <h1 className="text-2xl md:text-4xl font-black uppercase italic tracking-tighter text-black drop-shadow-[3px_3px_0_rgba(255,255,255,1)]">
+            {activeJobProfile ? "Editar Perfil de Trabajo" : "Crear Perfil de Trabajo"}
           </h1>
         </div>
 
@@ -307,7 +307,7 @@ const CreateProfile: FC = () => {
                       name="displayName"
                       value={personalData.displayName}
                       onChange={handlePersonalChange}
-                      className="w-full bg-yellow-100 border-2 border-black p-2 font-bold focus:outline-none focus:shadow-[2px_2px_0_0_#000]"
+                      className="w-full text-sm bg-yellow-100 border-2 border-black p-2 font-bold focus:outline-none focus:shadow-[2px_2px_0_0_#000]"
                       placeholder="Tu nombre..."
                     />
                   </div>
@@ -318,15 +318,15 @@ const CreateProfile: FC = () => {
                       name="phoneNumber"
                       value={personalData.phoneNumber}
                       onChange={handlePersonalChange}
-                      className="w-full bg-white border-2 border-black p-2 font-bold focus:outline-none focus:shadow-[2px_2px_0_0_#000]"
+                      className="w-full text-sm bg-white border-2 border-black p-2 font-bold focus:outline-none focus:shadow-[2px_2px_0_0_#000]"
                       placeholder="+34..."
                     />
                   </div>
                   <button
                     type="submit"
-                    className="bg-cyan-400 text-black font-bold py-2 border-2 border-black shadow-[3px_3px_0_0_#000] hover:translate-y-0.5 hover:shadow-[1px_1px_0_0_#000] active:translate-y-1 active:shadow-none transition-all flex justify-center items-center gap-2"
+                    className="text-sm bg-cyan-400 text-black font-bold py-2 border-2 border-black shadow-[3px_3px_0_0_#000] hover:translate-y-0.5 hover:shadow-[1px_1px_0_0_#000] active:translate-y-1 active:shadow-none transition-all flex justify-center items-center gap-2"
                   >
-                    <Save size={16} /> Guardar Personal
+                    <Save size={16} /> Guardar datos personales
                   </button>
                 </form>
               </div>
@@ -335,12 +335,13 @@ const CreateProfile: FC = () => {
 
           {/* Lado Derecho: Mis Empleos */}
           <div className="lg:col-span-2">
-            <div className="flex justify-between items-end mb-4">
-              <h2 className="text-2xl font-black uppercase italic bg-yellow-300 px-2 border-2 border-black inline-block shadow-[3px_3px_0_0_#000]">
+            <div className="flex flex-col md:flex-row gap-4 md:justify-between md:items-end mb-4">
+              <h2 className="md:w-full text-2xl font-black uppercase italic bg-yellow-300 px-2 border-2 border-black inline-block shadow-[3px_3px_0_0_#000]">
                 Mis Empleos
               </h2>
               {!isEditingJob && (
                 <button
+                  type="button"
                   onClick={openNewJobForm}
                   className="bg-green-500 text-white font-bold px-3 py-1 border-2 border-black shadow-[3px_3px_0_0_#000] hover:-translate-y-1 active:translate-y-0 transition-all flex items-center gap-1 text-sm"
                 >
@@ -375,7 +376,7 @@ const CreateProfile: FC = () => {
                         type="text"
                         value={jobData.companyName}
                         onChange={(e) => setJobData({ ...jobData, companyName: e.target.value })}
-                        className="w-full border-2 border-black p-2 font-bold"
+                        className="text-sm w-full border-2 border-black p-2 font-bold"
                         placeholder="Nombre de la empresa"
                         title="Nombre de la empresa"
                         aria-label="Nombre de la empresa"
@@ -387,7 +388,7 @@ const CreateProfile: FC = () => {
                         type="text"
                         value={jobData.jobTitle}
                         onChange={(e) => setJobData({ ...jobData, jobTitle: e.target.value })}
-                        className="w-full border-2 border-black p-2 font-bold"
+                        className="text-sm w-full border-2 border-black p-2 font-bold"
                         placeholder="Ej. Conductor, Admin..."
                         title="Cargo o puesto de trabajo"
                         aria-label="Cargo o puesto de trabajo"
@@ -402,7 +403,7 @@ const CreateProfile: FC = () => {
                         type="text"
                         value={jobData.employeeId}
                         onChange={(e) => setJobData({ ...jobData, employeeId: e.target.value })}
-                        className="w-full border-2 border-black p-2 font-bold"
+                        className="text-sm w-full border-2 border-black p-2 font-bold"
                         placeholder="ID numérico o alfa"
                         title="Número o identificador de empleado"
                       />
@@ -420,7 +421,7 @@ const CreateProfile: FC = () => {
                             sector: e.target.value as "General" | "Transporte",
                           })
                         }
-                        className="w-full border-2 border-black p-2 font-bold cursor-pointer"
+                        className="text-sm w-full border-2 border-black p-2 font-bold cursor-pointer"
                         title="Selecciona el sector de trabajo"
                       >
                         <option value="General">General</option>
@@ -432,14 +433,14 @@ const CreateProfile: FC = () => {
                   <div className="flex gap-4 mt-4">
                     <button
                       type="submit"
-                      className="flex-1 bg-black text-white font-bold py-3 hover:bg-gray-800 transition-colors"
+                      className="text-sm flex-1 bg-blue-500 text-white font-bold py-2 hover:bg-gray-800 transition-colors"
                     >
-                      {currentJobId ? "Actualizar Empleo" : "Guardar Empleo"}
+                      {currentJobId ? "Actualizar" : "Guardar"}
                     </button>
                     <button
                       type="button"
                       onClick={() => setIsEditingJob(false)}
-                      className="flex-1 bg-white border-2 border-black text-black font-bold py-3 hover:bg-gray-100 transition-colors"
+                      className="text-sm flex-1 bg-red-500 border-2 border-black text-white font-bold py-2 hover:bg-gray-100 transition-colors"
                     >
                       Cancelar
                     </button>

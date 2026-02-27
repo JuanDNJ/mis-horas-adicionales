@@ -8,9 +8,13 @@ import {
   signInWithPopup,
   signOut,
 } from "@/lib/firebase";
+import type { UserCredential } from "firebase/auth";
 
 export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const googleProvider = new GoogleAuthProvider();
+
+  googleProvider.setCustomParameters({ prompt: "select_account" });
+
   const [dataProfile, setDataProfile] = useState<UserContextType>({
     displayName: "",
     photoURL: "",
@@ -30,11 +34,12 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }));
   };
 
-  const login = async () => {
+  const login = async (): Promise<UserCredential> => {
     try {
-      await signInWithPopup(auth, googleProvider);
+      return signInWithPopup(auth, googleProvider);
     } catch (error) {
       console.error("Error during login:", error);
+      throw "Login failed";
     }
   };
 

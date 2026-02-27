@@ -7,7 +7,12 @@ interface HamburgerButtonProps {
 
 export const HamburgerButton: FC<HamburgerButtonProps> = ({ onClick }) => {
   return (
-    <button className="xl:hidden p-1 md:p-2 text-theme-color text-2xl" onClick={onClick}>
+    <button
+      type="button"
+      className="xl:hidden p-1 md:p-2 text-theme-color text-2xl"
+      onClick={onClick}
+      aria-label="Open Menu"
+    >
       <FaBars />
     </button>
   );

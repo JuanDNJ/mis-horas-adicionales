@@ -3,6 +3,7 @@ import { FaTimes } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useUserContext } from "@/hooks/useUserContext";
+import Logo from "./Logo";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -32,10 +33,14 @@ export const MobileMenu: FC<MobileMenuProps> = ({ isOpen, onClose }) => {
         )}
       >
         <article className="p-4 flex justify-between items-center border-b-4 border-black/10 bg-header-bg">
-          <h2 className="text-xl font-bold text-theme-color">Menú</h2>
+          <div className="flex items-center gap-2">
+            <Logo />
+          </div>
           <button
+            type="button"
             onClick={onClose}
             className="text-2xl text-theme-color hover:rotate-90 transition-transform"
+            aria-label="Close Menu"
           >
             <FaTimes />
           </button>
@@ -47,15 +52,15 @@ export const MobileMenu: FC<MobileMenuProps> = ({ isOpen, onClose }) => {
             onClick={onClose}
             className="text-theme-color font-bold text-xl py-2 px-4 hover:bg-black/10 rounded-lg transition-colors border-2 border-transparent hover:border-black/20"
           >
-            Home
+            Inicio
           </NavLink>
           {isAuthenticated && (
             <NavLink
-              to="/dashboard"
+              to="/records"
               onClick={onClose}
               className="text-theme-color font-bold text-xl py-2 px-4 hover:bg-black/10 rounded-lg transition-colors border-2 border-transparent hover:border-black/20"
             >
-              Dashboard
+              Registros
             </NavLink>
           )}
         </nav>

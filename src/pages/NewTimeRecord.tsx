@@ -4,9 +4,9 @@ import { cn } from "@/lib/utils";
 import type { FC } from "react";
 import IndexLayout from "./layouts/index.layout";
 import { FaPlus } from "react-icons/fa";
-import { NavLink } from "react-router-dom";
+import BtnBack from "@/components/BtnBack";
 
-const RecordNewHours: FC = () => {
+const NewTimeRecord: FC = () => {
   const { misHoras, handleHoursChange, handleAddHour, isSaving, setMisHoras, editingId } =
     useDashboard();
 
@@ -15,12 +15,7 @@ const RecordNewHours: FC = () => {
       <div className="w-full flex flex-col py-8 px-4">
         <div className="w-full flex items-center md:flex-row md:items-center justify-between gap-4 p-4 border-4 border-black bg-theme-bg shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] mb-8">
           <div className="flex items-center gap-4">
-            <NavLink
-              to="/dashboard"
-              className="text-sm font-bold uppercase text-theme-color hover:underline"
-            >
-              Volver al Dashboard
-            </NavLink>
+            <BtnBack />
           </div>
         </div>
         <HoursForm formData={misHoras} onChange={handleHoursChange} setFormData={setMisHoras} />
@@ -51,4 +46,4 @@ const RecordNewHours: FC = () => {
   );
 };
 
-export default RecordNewHours;
+export default NewTimeRecord;

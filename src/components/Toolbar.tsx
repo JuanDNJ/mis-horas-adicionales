@@ -1,14 +1,14 @@
 import type { FC } from "react";
 import { FaFilter } from "react-icons/fa";
 
-import { NavLink } from "react-router-dom";
-
 interface DashboardToolbarProps {
+  children: React.ReactNode;
   isAddDisabled?: boolean;
   activeCompanyName?: string;
 }
 
-export const DashboardToolbar: FC<DashboardToolbarProps> = ({
+export const Toolbar: FC<DashboardToolbarProps> = ({
+  children,
   isAddDisabled = false,
   activeCompanyName,
 }) => {
@@ -16,18 +16,12 @@ export const DashboardToolbar: FC<DashboardToolbarProps> = ({
     <div className="w-full flex items-center md:flex-row md:items-center justify-between gap-4 p-4 border-4 border-black bg-theme-bg shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] mb-8">
       {/* Left Actions: Toggle Form */}
       <div className="flex flex-col gap-1">
-        <div className="flex items-center gap-4">
-          <NavLink
-            to="/record"
-            className="text-sm font-bold uppercase text-theme-color hover:underline"
-          >
-            Registrar Horas
-          </NavLink>
-        </div>
-        {isAddDisabled && (
+        {isAddDisabled ? (
           <span className="text-xs font-bold text-red-600 bg-red-100 px-2 py-1 border border-red-500 inline-block">
             ⚠ Completa tu perfil primero
           </span>
+        ) : (
+          <nav className="flex items-center gap-4">{children}</nav>
         )}
       </div>
 

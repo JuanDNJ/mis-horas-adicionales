@@ -1,4 +1,5 @@
 import { type Theme } from "@/config";
+import type { UserCredential } from "firebase/auth";
 
 export interface GlobalContextType {
   appTitle: string;
@@ -15,11 +16,20 @@ export interface UserContextType {
   employeeId?: string;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login?: () => void;
+  login?: () => Promise<UserCredential>;
   logout?: () => void;
   updateUserProfile?: (name: string, photo: string, phoneNumber: string, email: string) => void;
 }
-
+export type UserCredentials = UserCredential;
+export interface Job {
+  id: string;
+  title: string;
+  company: string;
+  sector: "General" | "Transporte";
+  employeeId: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
 export interface JobProfile {
   id: string;
   companyName: string; // Nombre de la empresa -> para el campo 'empresa'
@@ -64,4 +74,22 @@ export interface ProfileContextType {
 
   refreshProfile: () => Promise<void>;
 }
-// touch
+export interface UserRecord {
+  empresa: string;
+  numero_empleado: string;
+  nombre: string;
+  apellido_paterno: string;
+  apellido_materno: string;
+  telefono: string;
+  dia: string;
+  mes: string;
+  anio: string;
+  hora_entrada: string;
+  hora_salida: string;
+  origen: string;
+  destino: string;
+  total_horas: string;
+}
+export interface Children {
+  children: React.ReactNode;
+}

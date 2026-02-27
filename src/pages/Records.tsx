@@ -1,12 +1,14 @@
 import { HoursTable } from "@/components/HoursTable";
-import { DashboardToolbar } from "@/components/DashboardToolbar";
+import { Toolbar } from "@/components/Toolbar";
 import IndexLayout from "./layouts/index.layout";
 import useDashboard from "@/hooks/pages/useDashboard";
+import { NavLink, useNavigate } from "react-router";
+import { useEffect } from "react";
+import useProfile from "@/hooks/pages/useProfile";
 
-const Dashboard = () => {
+const Records = () => {
+  const navigate = useNavigate();
   const {
-    isProfileIncomplete,
-    activeJobProfile,
     jobProfiles,
     horas,
     groupedHours,
@@ -16,14 +18,24 @@ const Dashboard = () => {
     isLoading,
     error,
   } = useDashboard();
+  const { userProfile, activeJobProfile } = useProfile();
+  useEffect(() => {
+    if (!activeJobProfile) {
+      navigate("/create-profile");
+    }
+  }, [activeJobProfile, navigate]);
 
   return (
     <IndexLayout>
       <div className="w-full flex flex-col py-8 px-4">
-        <DashboardToolbar
-          isAddDisabled={isProfileIncomplete}
-          activeCompanyName={activeJobProfile?.companyName}
-        />
+        <Toolbar isAddDisabled={!userProfile} activeCompanyName={activeJobProfile?.companyName}>
+          <NavLink
+            to="/new-time-record"
+            className="text-sm font-bold uppercase text-theme-color hover:underline"
+          >
+            Registrar Horas
+          </NavLink>
+        </Toolbar>
 
         <div className="flex flex-col xl:flex-row items-start justify-center w-full gap-8">
           {/* Table Column - Auto Expand */}
@@ -90,4 +102,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default Records;

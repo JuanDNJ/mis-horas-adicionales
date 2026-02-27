@@ -1,13 +1,14 @@
 import { lazy } from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import RecordNewHours from "@/pages/RecordNewHours";
 
 const App = lazy(() => import("@/App"));
 const Profile = lazy(() => import("@/pages/Profile"));
 const CreateProfile = lazy(() => import("@/pages/CreateProfile"));
-const Dashboard = lazy(() => import("@/pages/Dashboard"));
+const Records = lazy(() => import("@/pages/Records"));
 const RecordDetail = lazy(() => import("@/pages/RecordDetail"));
+const NewTimeRecord = lazy(() => import("@/pages/NewTimeRecord"));
+const TimeDetail = lazy(() => import("@/pages/TimeDetail"));
 
 const router = createBrowserRouter([
   {
@@ -18,12 +19,16 @@ const router = createBrowserRouter([
     element: <ProtectedRoute />,
     children: [
       {
-        path: "/dashboard",
-        element: <Dashboard />,
+        path: "/records",
+        element: <Records />,
       },
       {
-        path: "/record",
-        element: <RecordNewHours />,
+        path: "/new-time-record",
+        element: <NewTimeRecord />,
+      },
+      {
+        path: "/time-detail/:id",
+        element: <TimeDetail />,
       },
       {
         path: "/record/:id",

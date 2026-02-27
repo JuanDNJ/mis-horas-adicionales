@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { FaTrash, FaPen, FaEye } from "react-icons/fa";
 import { type HoursRecord } from "@/lib/hoursService";
 
@@ -13,7 +13,7 @@ interface HoursTableProps {
 export const HoursTable = ({
   data,
   onDelete,
-  onEdit,
+  // onEdit,
   title,
   showRoute = true,
 }: HoursTableProps) => {
@@ -97,6 +97,7 @@ export const HoursTable = ({
                   <div className="flex items-center justify-center gap-2">
                     {item.id && (
                       <button
+                        type="button"
                         onClick={() => navigate(`/record/${item.id}`)}
                         className="p-2 bg-action-create hover:brightness-110 border-2 border-black text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-0.5 active:translate-y-0.5 transition-all"
                         title="Ver detalle"
@@ -104,14 +105,23 @@ export const HoursTable = ({
                         <FaEye size={18} />
                       </button>
                     )}
-                    <button
+                    {/* <button
+                      type="button"
                       onClick={() => onEdit(item)}
                       className="p-2 bg-action-edit hover:brightness-110 border-2 border-black text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-0.5 active:translate-y-0.5 transition-all"
                       title="Editar registro"
                     >
                       <FaPen size={18} />
-                    </button>
+                    </button> */}
+                    <NavLink
+                      to={`/time-detail/${item.id}`}
+                      className="p-2 bg-action-edit hover:brightness-110 border-2 border-black text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]  transition-all"
+                      title="Editar registro"
+                    >
+                      <FaPen size={18} />
+                    </NavLink>
                     <button
+                      type="button"
                       onClick={() => onDelete(item)}
                       className="p-2 bg-action-delete hover:brightness-110 border-2 border-black text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-0.5 active:translate-y-0.5 transition-all"
                       title="Eliminar registro"
@@ -144,14 +154,21 @@ export const HoursTable = ({
                   <FaEye size={14} />
                 </button>
               )}
-              <button
+              {/* <button
                 type="button"
                 onClick={() => onEdit(item)}
                 className="p-2 bg-action-edit hover:brightness-110 border-2 border-black text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
                 title="Editar registro"
               >
                 <FaPen size={14} />
-              </button>
+              </button> */}
+              <NavLink
+                to={`/time-detail/${item.id}`}
+                className="p-2 bg-action-edit hover:brightness-110 border-2 border-black text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]  transition-all"
+                title="Editar registro"
+              >
+                <FaPen size={18} />
+              </NavLink>
               <button
                 type="button"
                 onClick={() => onDelete(item)}

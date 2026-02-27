@@ -1,15 +1,16 @@
 import type { FC } from "react";
-import { FaImage } from "react-icons/fa";
 import { TitleWithIcon } from "./TitleWithIcon";
-
+import logo from "@/assets/logo.png";
 export const Brand: FC = () => {
   return (
-    <TitleWithIcon
-      as="h1"
-      title="Horas Adicionales"
-      titleClassName="hidden sm:block text-2xl tracking-wider text-outline-white"
-    >
-      <FaImage className="text-2xl md:text-4xl text-theme-color drop-shadow-[2px_2px_0px_rgba(255,255,255,0.8)]" />
-    </TitleWithIcon>
+    <section className="hidden md:flex">
+      <TitleWithIcon
+        as="h1"
+        title="Horas Adicionales"
+        titleClassName="flex text-2xl tracking-wider text-outline-white"
+      >
+        <img src={logo} alt="Horas Adicionales Logo" className="md:w-16 md:h-16  shrink-0" />
+      </TitleWithIcon>
+    </section>
   );
 };
